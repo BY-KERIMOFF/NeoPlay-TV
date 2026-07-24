@@ -1,0 +1,4 @@
+- [ ] `gradle/libs.versions.toml` və `app/build.gradle.kts` fayllarına `media3-datasource-okhttp` əlavə edilməsi
+- [ ] `PlayerActivity.java` daxilində OkHttp şəbəkə mühərrikinin, HTTP/2 və `stream.php` HLS MimeType məntiqinin tətbiqi
+- [ ] `LiveTvActivity.java` daxilində mini player üçün `stream.php` HLS dəstəyinin tətbiqi
+- [ ] Build və test

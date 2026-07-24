@@ -1,0 +1,6 @@
+- [x] Change package name to `com.neoplay.tv` in `build.gradle.kts`
+- [x] Refactor all source files package and imports
+- [x] Restructure directory path to `com/neoplay/tv`
+- [x] Verify project build successfully
+- [ ] Generate Release Keystore (requires user action)
+- [ ] Create Release Build (.aab)

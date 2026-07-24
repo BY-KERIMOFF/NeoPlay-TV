@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Deep Dark Palette -->
+    <color name="bg_main">#0A0A0A</color>
+    <color name="bg_sidebar">#121212</color>
+
+    <!-- Gold Accent Palette -->
+    <color name="gold_primary">#FFD700</color>
+    <color name="gold_dark">#B8860B</color>
+    <color name="item_focus_color">#FFD700</color>
+
+    <!-- Glass & Text Colors -->
+    <color name="glass_white">#1AFFFFFF</color>
+    <color name="glass_white_heavy">#33FFFFFF</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B0B0</color>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

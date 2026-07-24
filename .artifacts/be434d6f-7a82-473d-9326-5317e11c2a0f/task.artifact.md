@@ -1,0 +1,7 @@
+- [ ] **Xtream VOD və Series Tam İnteqrasiyası**
+    - [ ] `ApiService.java`-da VOD/Series kateqoriya metodlarının əlavə edilməsi
+    - [ ] `LiveTvActivity.java`-da VOD/Series kateqoriya və kanallarının yüklənmə məntiqinin qurulması
+    - [ ] VOD rejimində Sidebar-ın müvafiq kateqoriyalarla doldurulması
+    - [ ] Pleyer linklərinin VOD formatına uyğunlaşdırılması
+- [ ] **Yaddaş və Performans Testi**
+- [ ] **Yekun Build**
