@@ -52,6 +52,9 @@ public class UpdateManager {
                 String latestVersionName = json.getString("versionName");
                 String apkUrl = json.getString("apkUrl");
                 String notes = json.optString("releaseNotes", "");
+                String announcement = json.optString("announcement", "");
+
+                DataManager.setAdminAnnouncement(announcement);
 
                 long currentVersionCode = getAppVersionCode();
 
@@ -97,8 +100,8 @@ public class UpdateManager {
     private void downloadAndInstall(String apkUrl) {
         Toast.makeText(context, "Yükləmə başlayır...", Toast.LENGTH_LONG).show();
         
-        // Daha etibarlı qovluq (Public Downloads)
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "neoplay_v2.apk");
+        // Daxili qovluq istifadə edək (FileProvider üçün daha etibarlıdır)
+        File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "update.apk");
         if (file.exists()) file.delete();
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(apkUrl))
@@ -116,10 +119,11 @@ public class UpdateManager {
                 public void onReceive(Context context, Intent intent) {
                     long completedId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
                     if (id == completedId) {
-                        if (file.exists() && file.length() > 1000) { // Faylın real olduğunu yoxla
+                        if (file.exists() && file.length() > 1024) {
                             installApk(file);
                         } else {
-                            Log.e(TAG, "Downloaded file is invalid or too small");
+                            Log.e(TAG, "Downloaded file is invalid");
+                            Toast.makeText(context, "Yükləmə xətası, fayl tapılmadı", Toast.LENGTH_SHORT).show();
                         }
                         context.unregisterReceiver(this);
                     }

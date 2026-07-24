@@ -38,6 +38,15 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    // APK faylının adını avtomatik düzəlt (neoplay_vX.apk formatında)
+    applicationVariants.all {
+        val variant = this
+        outputs.all {
+            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            output.outputFileName = "neoplay_v${variant.versionCode}.apk"
+        }
+    }
 }
 
 dependencies {

@@ -1,6 +1,20 @@
-- [x] Change package name to `com.neoplay.tv` in `build.gradle.kts`
-- [x] Refactor all source files package and imports
-- [x] Restructure directory path to `com/neoplay/tv`
-- [x] Verify project build successfully
-- [ ] Generate Release Keystore (requires user action)
-- [ ] Create Release Build (.aab)
+- [x] Improve `M3UParser.java` to handle URLs on the same line as `#EXTINF`
+- [x] Refactor `LiveTvActivity.java` to use `M3UParser.parse()` and fix the mini player
+- [x] Update `PlayerActivity.java` with better `User-Agent` and compatibility fixes
+- [x] Implement dynamic `Referer` and `Origin` headers in `NetworkUtils.java`
+- [x] Optimize ExoPlayer buffer settings for unstable IPTV streams
+- [x] Enable Decoder Fallback in `PlayerActivity.java` for better audio support
+- [x] Add RTSP support in `build.gradle.kts`
+- [x] Implement numeric key channel switching in `PlayerActivity.java`
+- [x] Add animated Technical Failure overlay for broken channels in `PlayerActivity.java`
+- [x] Ensure in-player category navigation works smoothly with Sol button
+- [x] Add In-Player Channel Search functionality
+- [x] Fix Audio (No Sound) issues for various formats
+- [x] Implement Universal/Automatic EPG Support
+- [x] Implement Sleep Timer (Yuxu Taymeri) with UI and background logic
+- [x] Implement real-time updates for Speed Test in `SpeedTestActivity.java`
+- [x] Add Admin Scrolling Announcements (Qaçan Sətir)
+    - [x] Update `DataManager.java` for storage
+    - [x] Update `UpdateManager.java` for parsing
+    - [x] Update `activity_player.xml` UI
+    - [x] Update `PlayerActivity.java` logic

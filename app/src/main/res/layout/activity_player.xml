@@ -12,6 +12,24 @@
         app:use_controller="false"
         app:resize_mode="fill" />
 
+    <!-- Admin Duyurusu (Qaçan Sətir) -->
+    <TextView
+        android:id="@+id/tvAnnouncement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#99000000"
+        android:padding="8dp"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:visibility="gone"
+        android:text="Yeni kanallar əlavə edildi! Xoş izləmələr." />
+
     <!-- Modernized OSD -->
     <LinearLayout
         android:id="@+id/osdLayout"

@@ -158,6 +158,19 @@ public class PlayerActivity extends AppCompatActivity {
         if (channelList != null && !channelList.isEmpty()) {
             loadChannel(channelList.get(currentIndex));
         }
+
+        setupAnnouncement();
+    }
+
+    private void setupAnnouncement() {
+        String announcement = DataManager.getAdminAnnouncement();
+        if (announcement != null && !announcement.isEmpty()) {
+            binding.tvAnnouncement.setText(announcement);
+            binding.tvAnnouncement.setVisibility(View.VISIBLE);
+            binding.tvAnnouncement.setSelected(true); // Marquee effektini başlatmaq üçün
+        } else {
+            binding.tvAnnouncement.setVisibility(View.GONE);
+        }
     }
 
     private void setupPlayerChannelList() {

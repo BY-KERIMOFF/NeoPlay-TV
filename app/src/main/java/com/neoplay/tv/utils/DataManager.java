@@ -13,6 +13,7 @@ public class DataManager {
     private static Map<String, List<Channel>> currentChannelMap = new HashMap<>();
     private static String globalEpgUrl = "";
     private static Map<String, String> xmltvCache = new HashMap<>();
+    private static String adminAnnouncement = "";
     
     public static void setGlobalEpgUrl(String url) {
         globalEpgUrl = url;
@@ -33,6 +34,14 @@ public class DataManager {
 
     public static Map<String, String> getXmltvCache() {
         return xmltvCache;
+    }
+
+    public static void setAdminAnnouncement(String announcement) {
+        adminAnnouncement = announcement;
+    }
+
+    public static String getAdminAnnouncement() {
+        return adminAnnouncement;
     }
 
     public static void setCurrentChannelList(List<Channel> list) {

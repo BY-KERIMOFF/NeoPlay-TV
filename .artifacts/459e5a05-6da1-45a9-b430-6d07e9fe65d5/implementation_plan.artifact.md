@@ -1,47 +1,30 @@
-# Implementation Plan - Custom APK Update System (Müstəqil Yeniləmə)
+# Implementation Plan - Admin Scrolling Announcements
 
-The goal is to implement a manual in-app update mechanism that checks a custom server for the latest APK version, downloads it, and prompts the user to install it. This works without Google Play Store.
-
-## User Review Required
-
-> [!IMPORTANT]
-> You will need to host a small JSON file (e.g., `version.json`) on your server.
-> Example JSON content:
-> ```json
-> {
->   "versionCode": 2,
->   "versionName": "1.0.1",
->   "apkUrl": "https://yourserver.com/neoplay.apk",
->   "releaseNotes": "Səs problemləri düzəldildi."
-> }
-> ```
-
-> [!WARNING]
-> On Android 8.0 (Oreo) and above, the user must grant the "Install unknown apps" permission for Neo Play when the update starts.
+The goal is to implement a remote-controlled scrolling text announcement at the top of the player. This will allow the admin to push messages to all users via the `update.json` file.
 
 ## Proposed Changes
 
+### [utils]
+
+#### [MODIFY] [DataManager.java](file:///home/by-kerimoff/AndroidStudioProjects/Neoplay/app/src/main/java/com/neoplay/tv/utils/DataManager.java)
+- Add a static field `adminAnnouncement` with a getter and setter.
+
+#### [MODIFY] [UpdateManager.java](file:///home/by-kerimoff/AndroidStudioProjects/Neoplay/app/src/main/java/com/neoplay/tv/utils/UpdateManager.java)
+- Parse the `"announcement"` field from the server's JSON response and store it in `DataManager`.
+
 ### [app]
 
-#### [MODIFY] [AndroidManifest.xml](file:///home/by-kerimoff/AndroidStudioProjects/Neoplay/app/src/main/AndroidManifest.xml)
-- Add `android.permission.REQUEST_INSTALL_PACKAGES`.
-- Add `android.permission.INTERNET` and `android.permission.WRITE_EXTERNAL_STORAGE` (if needed for older versions).
-- Configure a `FileProvider` to securely share the downloaded APK with the system installer.
+#### [MODIFY] [activity_player.xml](file:///home/by-kerimoff/AndroidStudioProjects/Neoplay/app/src/main/res/layout/activity_player.xml)
+- Add a marquee `TextView` at the very top of the layout.
+- Use a semi-transparent dark background for better legibility.
 
-#### [NEW] [xml/file_paths.xml](file:///home/by-kerimoff/AndroidStudioProjects/Neoplay/app/src/main/res/xml/file_paths.xml)
-- Define paths for the `FileProvider`.
-
-#### [NEW] [UpdateManager.java](file:///home/by-kerimoff/AndroidStudioProjects/Neoplay/app/src/main/java/com/neoplay/tv/utils/UpdateManager.java)
-- Implement background check for the JSON file.
-- Implement APK download using `DownloadManager`.
-- Implement BroadcastReceiver to detect when download is complete and trigger installation.
-
-#### [MODIFY] [MainActivity.java](file:///home/by-kerimoff/AndroidStudioProjects/Neoplay/app/src/main/java/com/neoplay/tv/MainActivity.java)
-- Trigger the update check during startup.
+#### [MODIFY] [PlayerActivity.java](file:///home/by-kerimoff/AndroidStudioProjects/Neoplay/app/src/main/java/com/neoplay/tv/PlayerActivity.java)
+- Check `DataManager.getAdminAnnouncement()` during `onCreate`.
+- If not empty, show the `tvAnnouncement` and enable the marquee effect.
 
 ## Verification Plan
 
 ### Manual Verification
-- Simulate a new version by hosting a mock JSON file.
-- Verify the "Update Available" dialog appears.
-- Verify the APK downloads and the installation screen pops up.
+- Update the server JSON with an announcement string.
+- Open the player and confirm the text scrolls continuously at the top.
+- Confirm it works for both M3U and Xtream modes.
