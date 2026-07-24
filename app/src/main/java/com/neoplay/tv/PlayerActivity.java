@@ -163,14 +163,40 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void setupAnnouncement() {
+        SharedPreferences prefs = getSharedPreferences("neoplay_prefs", MODE_PRIVATE);
         String announcement = DataManager.getAdminAnnouncement();
+        
+        // Əgər DataManager-də hələ yoxdursa, yaddaşdan oxu
+        if (announcement == null || announcement.isEmpty()) {
+            announcement = prefs.getString("last_announcement", "");
+        }
+
         if (announcement != null && !announcement.isEmpty()) {
             binding.tvAnnouncement.setText(announcement);
             binding.tvAnnouncement.setVisibility(View.VISIBLE);
-            binding.tvAnnouncement.setSelected(true); // Marquee effektini başlatmaq üçün
+            startAnnouncementAnimation();
         } else {
             binding.tvAnnouncement.setVisibility(View.GONE);
         }
+    }
+
+    private void startAnnouncementAnimation() {
+        binding.tvAnnouncement.post(() -> {
+            float screenWidth = getResources().getDisplayMetrics().widthPixels;
+            float textWidth = binding.tvAnnouncement.getPaint().measureText(binding.tvAnnouncement.getText().toString());
+            
+            // Animasiya: Sağdan sola
+            android.view.animation.TranslateAnimation animation = new android.view.animation.TranslateAnimation(
+                    screenWidth, 
+                    -textWidth - 500, // Ekranda tam itənə qədər getsin
+                    0, 0);
+            
+            animation.setDuration(15000); // Sürət: 15 saniyə (İstəyə görə dəyişmək olar)
+            animation.setRepeatCount(android.view.animation.Animation.INFINITE);
+            animation.setInterpolator(new android.view.animation.LinearInterpolator());
+            
+            binding.tvAnnouncement.startAnimation(animation);
+        });
     }
 
     private void setupPlayerChannelList() {

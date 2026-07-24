@@ -12,23 +12,20 @@
         app:use_controller="false"
         app:resize_mode="fill" />
 
-    <!-- Admin Duyurusu (Qaçan Sətir) -->
     <TextView
         android:id="@+id/tvAnnouncement"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:background="#99000000"
-        android:padding="8dp"
-        android:textColor="@color/white"
+        android:padding="10dp"
+        android:textColor="@color/gold_primary"
         android:textSize="18sp"
         android:textStyle="bold"
         android:singleLine="true"
-        android:ellipsize="marquee"
-        android:marqueeRepeatLimit="marquee_forever"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         android:visibility="gone"
-        android:text="Yeni kanallar əlavə edildi! Xoş izləmələr." />
+        android:elevation="200dp"
+        android:text="Neo Play TV" />
 
     <!-- Modernized OSD -->
     <LinearLayout

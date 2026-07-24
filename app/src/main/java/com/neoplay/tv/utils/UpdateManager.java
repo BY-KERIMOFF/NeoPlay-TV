@@ -55,6 +55,12 @@ public class UpdateManager {
                 String announcement = json.optString("announcement", "");
 
                 DataManager.setAdminAnnouncement(announcement);
+                
+                // Daimi yaddaşa yaz
+                context.getSharedPreferences("neoplay_prefs", Context.MODE_PRIVATE)
+                        .edit()
+                        .putString("last_announcement", announcement)
+                        .apply();
 
                 long currentVersionCode = getAppVersionCode();
 
