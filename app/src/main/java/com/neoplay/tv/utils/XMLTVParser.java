@@ -22,6 +22,7 @@ public class XMLTVParser {
     private static final String[] DEFAULT_SOURCES = {
         "https://epg.pw/xmltv/feed/az.xml",
         "https://epg.pw/xmltv/feed/tr.xml",
+        "https://iptv-epg.org/files/epg-tr.xml.gz",
         "https://epg.pw/xmltv/feed/ru.xml",
         "https://epg.pw/xmltv/feed/it.xml",
         "https://epg.pw/xmltv/feed/de.xml",
