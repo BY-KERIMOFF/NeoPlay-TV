@@ -383,6 +383,22 @@ class MainActivity : AppCompatActivity() {
 
         val slideUp = AnimationUtils.loadAnimation(this, R.anim.fade_in)
         binding.dashboardLayout.startAnimation(slideUp)
+
+        loadWeather()
+    }
+
+    private fun loadWeather() {
+        com.neoplay.tv.utils.WeatherManager.fetchWeather(object : com.neoplay.tv.utils.WeatherManager.WeatherCallback {
+            override fun onSuccess(temp: String, weatherCode: Int) {
+                binding.weatherLayout.visibility = View.VISIBLE
+                binding.tvTemperature.text = temp
+                binding.tvWeatherEmoji.text = com.neoplay.tv.utils.WeatherManager.getWeatherEmoji(weatherCode)
+            }
+
+            override fun onFailure(error: String) {
+                binding.weatherLayout.visibility = View.GONE
+            }
+        })
     }
 
     private fun showError(title: String, message: String) {

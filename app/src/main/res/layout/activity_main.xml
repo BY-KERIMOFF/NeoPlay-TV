@@ -114,24 +114,60 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:gravity="end"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
-                <TextClock
+                <!-- Weather Section -->
+                <LinearLayout
+                    android:id="@+id/weatherLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:format12Hour="HH:mm"
-                    android:format24Hour="HH:mm"
-                    android:textColor="@color/white"
-                    android:textSize="32sp"
-                    android:textStyle="bold" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginEnd="24dp"
+                    android:visibility="gone">
 
-                <TextView
-                    android:id="@+id/tvDate"
+                    <TextView
+                        android:id="@+id/tvWeatherEmoji"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="☀️"
+                        android:textSize="32sp" />
+
+                    <TextView
+                        android:id="@+id/tvTemperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="--°C"
+                        android:textColor="@color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Clock Section -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Cümə, 24 İyul"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="16sp" />
+                    android:gravity="end"
+                    android:orientation="vertical">
+
+                    <TextClock
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:format12Hour="HH:mm"
+                        android:format24Hour="HH:mm"
+                        android:textColor="@color/white"
+                        android:textSize="32sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cümə, 24 İyul"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="16sp" />
+                </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
 
