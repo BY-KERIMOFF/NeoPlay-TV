@@ -57,6 +57,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        com.neoplay.tv.utils.WallpaperManager.applyWallpaper(this, binding.ivAppBackground)
+
         deviceMac = MacUtils.getMacAddress(this)
 
         // Yeniləməni yoxla

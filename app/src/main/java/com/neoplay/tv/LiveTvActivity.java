@@ -70,6 +70,8 @@ public class LiveTvActivity extends AppCompatActivity {
         binding = ActivityLiveTvBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        com.neoplay.tv.utils.WallpaperManager.INSTANCE.applyWallpaper(this, binding.ivAppBackground);
+
         SharedPreferences prefs = getSharedPreferences("neoplay_prefs", MODE_PRIVATE);
         playlistType = prefs.getString("playlist_type", "m3u");
         m3uUrl = prefs.getString("m3u_url", "");

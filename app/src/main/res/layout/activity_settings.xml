@@ -6,6 +6,7 @@
 
     <!-- Panoramic Background -->
     <ImageView
+        android:id="@+id/ivAppBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/app_background"
@@ -322,6 +323,40 @@
                         android:backgroundTint="@color/glass_white_heavy"
                         android:textColor="@color/white"
                         android:visibility="gone" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Wallpaper Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Arxa Fon Seçimi"
+                android:textColor="@color/text_secondary"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/bg_sidebar"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:background="@drawable/glass_card_bg">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvWallpapers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:focusable="true"
+                        android:clickable="true"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

@@ -17,6 +17,8 @@ public class LockActivity extends AppCompatActivity {
         binding = ActivityLockBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        com.neoplay.tv.utils.WallpaperManager.INSTANCE.applyWallpaper(this, binding.ivAppBackground);
+
         SharedPreferences prefs = getSharedPreferences("neoplay_prefs", MODE_PRIVATE);
         String savedPin = prefs.getString("app_pin", "0000");
 

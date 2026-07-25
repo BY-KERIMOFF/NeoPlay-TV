@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.neoplay.tv.databinding.ActivitySettingsBinding;
 import com.neoplay.tv.utils.MacUtils;
 import com.neoplay.tv.utils.SleepTimerManager;
+import com.neoplay.tv.utils.WallpaperManager;
+import com.neoplay.tv.adapters.WallpaperAdapter;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -26,8 +28,10 @@ public class SettingsActivity extends AppCompatActivity {
 
         prefs = getSharedPreferences("neoplay_prefs", MODE_PRIVATE);
 
+        WallpaperManager.INSTANCE.applyWallpaper(this, binding.ivAppBackground);
         loadInfo();
         setupListeners();
+        setupWallpaperList();
     }
 
     private void loadInfo() {
@@ -169,5 +173,16 @@ public class SettingsActivity extends AppCompatActivity {
                 v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.scale_down));
             }
         });
+    }
+
+    private void setupWallpaperList() {
+        int currentIndex = WallpaperManager.INSTANCE.getCurrentWallpaperIndex(this);
+        WallpaperAdapter adapter = new WallpaperAdapter(WallpaperManager.INSTANCE.getWallpapers(), currentIndex, index -> {
+            WallpaperManager.INSTANCE.setCurrentWallpaperIndex(this, index);
+            WallpaperManager.INSTANCE.applyWallpaper(this, binding.ivAppBackground);
+            // Digər ekranlar açılanda yeni fonu görəcək
+            Toast.makeText(this, "Arxa fon dəyişdirildi", Toast.LENGTH_SHORT).show();
+        });
+        binding.rvWallpapers.setAdapter(adapter);
     }
 }
