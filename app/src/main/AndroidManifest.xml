@@ -55,9 +55,7 @@
             android:name=".SettingsActivity"
             android:screenOrientation="landscape" />
 
-        <activity
-            android:name=".SpeedTestActivity"
-            android:screenOrientation="landscape" />
+
 
         <receiver
             android:name=".BootReceiver"

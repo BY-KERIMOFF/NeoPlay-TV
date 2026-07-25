@@ -117,7 +117,6 @@ class MainActivity : AppCompatActivity() {
         setupFocusEffect(binding.cardFavorites)
         setupFocusEffect(binding.btnSettings)
         setupFocusEffect(binding.btnSearch)
-        setupFocusEffect(binding.btnSpeedTestMain)
 
         binding.btnRetry.setOnClickListener {
             retryCount = 0
@@ -148,10 +147,6 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnSettings.setOnClickListener {
             startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
-        }
-
-        binding.btnSpeedTestMain.setOnClickListener {
-            startActivity(Intent(this@MainActivity, SpeedTestActivity::class.java))
         }
 
         // Search düyməsi üçün Live TV-yə yönləndirmə

@@ -59,7 +59,6 @@ public class SettingsActivity extends AppCompatActivity {
         setupFocusEffect(binding.rbExo2);
         setupFocusEffect(binding.btnRefreshData);
         setupFocusEffect(binding.btnBack);
-        setupFocusEffect(binding.btnSpeedTest);
         
         setupFocusEffect(binding.btnTimerOff);
         setupFocusEffect(binding.btnTimer15);
@@ -110,10 +109,6 @@ public class SettingsActivity extends AppCompatActivity {
                 com.neoplay.tv.utils.XMLTVParser.downloadAndParse(manualEpg);
             }
             Toast.makeText(this, "Bütün EPG mənbələri yenilənir...", Toast.LENGTH_SHORT).show();
-        });
-
-        binding.btnSpeedTest.setOnClickListener(v -> {
-            startActivity(new Intent(SettingsActivity.this, SpeedTestActivity.class));
         });
 
         binding.btnPrivacyPolicy.setOnClickListener(v -> {
