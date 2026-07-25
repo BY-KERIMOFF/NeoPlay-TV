@@ -1,107 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/bg_main">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <!-- Panoramic Background -->
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="32dp">
+        android:layout_height="match_parent"
+        android:src="@drawable/app_background"
+        android:scaleType="centerCrop" />
+
+    <!-- Dark Overlay for Readability -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#B3000000" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="24dp">
+            android:orientation="vertical"
+            android:padding="32dp">
 
-            <TextView
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="TƏNZİMLƏMƏLƏR"
-                android:textColor="@color/gold_primary"
-                android:textSize="28sp"
-                android:textStyle="bold" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="24dp">
 
-            <Button
-                android:id="@+id/btnBack"
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="TƏNZİMLƏMƏLƏR"
+                    android:textColor="@color/gold_primary"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="GERİ"
+                    android:backgroundTint="@color/glass_white_heavy"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <!-- Account Info Section -->
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="GERİ"
-                android:backgroundTint="@color/glass_white_heavy"
-                android:textColor="@color/white" />
-        </LinearLayout>
+                android:text="Hesab Məlumatları"
+                android:textColor="@color/text_secondary"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
 
-        <!-- Account Info Section -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hesab Məlumatları"
-            android:textColor="@color/text_secondary"
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/bg_sidebar"
-            android:layout_marginBottom="24dp"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp">
-            <LinearLayout
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp"
-                android:background="@drawable/glass_card_bg">
-
-                <TextView
-                    android:id="@+id/tvMacAddress"
-                    android:layout_width="wrap_content"
+                android:backgroundTint="@color/bg_sidebar"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="MAC: --"
-                    android:textColor="@color/white"
-                    android:textSize="18sp" />
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:background="@drawable/glass_card_bg">
 
-                <TextView
-                    android:id="@+id/tvExpiryDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Bitiş Tarixi: --"
-                    android:textColor="@color/gold_primary"
-                    android:textSize="18sp" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+                    <TextView
+                        android:id="@+id/tvMacAddress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MAC: --"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
 
-        <!-- App Settings -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tətbiq Ayarları"
-            android:textColor="@color/text_secondary"
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
+                    <TextView
+                        android:id="@+id/tvExpiryDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Bitiş Tarixi: --"
+                        android:textColor="@color/gold_primary"
+                        android:textSize="18sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/bg_sidebar"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp">
-            <LinearLayout
+            <!-- App Settings -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tətbiq Ayarları"
+                android:textColor="@color/text_secondary"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
+
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp"
-                android:background="@drawable/glass_card_bg">
+                android:backgroundTint="@color/bg_sidebar"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:background="@drawable/glass_card_bg">
 
-                <CheckBox
+                    <CheckBox
                     android:id="@+id/cbBootOnStartup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -109,207 +124,217 @@
                     android:textColor="@color/white"
                     android:buttonTint="@color/gold_primary" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Video Player Rejimi:"
-                    android:textColor="@color/gold_primary"
-                    android:textSize="16sp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="8dp" />
-
-                <RadioGroup
-                    android:id="@+id/rgPlayerChoice"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <RadioButton
-                        android:id="@+id/rbExoStandard"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Standart Exo"
-                        android:textColor="@color/white"
-                        android:buttonTint="@color/gold_primary" />
-
-                    <RadioButton
-                        android:id="@+id/rbExo2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Exo 2 / V2 (Sürətli və Stabil)"
-                        android:textColor="@color/white"
-                        android:buttonTint="@color/gold_primary" />
-                </RadioGroup>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Xarici EPG Linki (M3U üçün):"
-                    android:textColor="@color/gold_primary"
-                    android:textSize="16sp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="8dp" />
-
-                <EditText
-                    android:id="@+id/etEpgUrl"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="https://example.com/epg.xml"
-                    android:textColorHint="#80FFFFFF"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:background="@drawable/glass_card_bg"
-                    android:padding="12dp"
-                    android:inputType="textUri" />
-
-                <Button
-                    android:id="@+id/btnRefreshData"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="Məlumatları Yenilə (Sync)"
-                    android:backgroundTint="@color/glass_white_heavy"
-                    android:textColor="@color/white" />
-
-                <Button
-                    android:id="@+id/btnSpeedTest"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="İnternet Sürət Testi"
-                    android:backgroundTint="@color/gold_dark"
-                    android:textColor="@color/white"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Sleep Timer Section -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Yuxu Taymeri"
-            android:textColor="@color/text_secondary"
-            android:textSize="18sp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp" />
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/bg_sidebar"
-            android:layout_marginBottom="24dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp"
-                android:background="@drawable/glass_card_bg">
-
-                <TextView
-                    android:id="@+id/tvCurrentTimerStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Status: Qapalı"
-                    android:textColor="@color/gold_primary"
-                    android:layout_marginBottom="16dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/btnTimerOff"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="OFF"
-                        android:layout_marginEnd="4dp" />
-
-                    <Button
-                        android:id="@+id/btnTimer15"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="15 dk"
-                        android:layout_marginEnd="4dp" />
-
-                    <Button
-                        android:id="@+id/btnTimer30"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="30 dk"
-                        android:layout_marginEnd="4dp" />
-
-                    <Button
-                        android:id="@+id/btnTimer60"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="60 dk"
-                        android:layout_marginEnd="4dp" />
-
-                    <Button
-                        android:id="@+id/btnTimer120"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="120 dk" />
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- App Lock Section -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Təhlükəsizlik"
-            android:textColor="@color/text_secondary"
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/bg_sidebar"
-            android:layout_marginBottom="40dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp"
-                android:background="@drawable/glass_card_bg">
-
                 <CheckBox
-                    android:id="@+id/cbAppLock"
+                    android:id="@+id/cbAutoStartLast"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tətbiq Kilidini Aktiv Et"
+                    android:layout_marginTop="8dp"
+                    android:text="Son baxılan kanalı avtomatik başlat"
                     android:textColor="@color/white"
                     android:buttonTint="@color/gold_primary" />
 
-                <Button
-                    android:id="@+id/btnChangePin"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Video Player Rejimi:"
+                        android:textColor="@color/gold_primary"
+                        android:textSize="16sp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="8dp" />
+
+                    <RadioGroup
+                        android:id="@+id/rgPlayerChoice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <RadioButton
+                            android:id="@+id/rbExoStandard"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Standart Exo"
+                            android:textColor="@color/white"
+                            android:buttonTint="@color/gold_primary" />
+
+                        <RadioButton
+                            android:id="@+id/rbExo2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Exo 2 / V2 (Sürətli və Stabil)"
+                            android:textColor="@color/white"
+                            android:buttonTint="@color/gold_primary" />
+                    </RadioGroup>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Xarici EPG Linki (M3U üçün):"
+                        android:textColor="@color/gold_primary"
+                        android:textSize="16sp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="8dp" />
+
+                    <EditText
+                        android:id="@+id/etEpgUrl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="https://example.com/epg.xml"
+                        android:textColorHint="#80FFFFFF"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:background="@drawable/glass_card_bg"
+                        android:padding="12dp"
+                        android:inputType="textUri" />
+
+                    <Button
+                        android:id="@+id/btnRefreshData"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:text="Məlumatları Yenilə (Sync)"
+                        android:backgroundTint="@color/glass_white_heavy"
+                        android:textColor="@color/white" />
+
+                    <Button
+                        android:id="@+id/btnSpeedTest"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="İnternet Sürət Testi"
+                        android:backgroundTint="@color/gold_dark"
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Sleep Timer Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Yuxu Taymeri"
+                android:textColor="@color/text_secondary"
+                android:textSize="18sp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/bg_sidebar"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="PİN KODU DƏYİŞDİR"
-                    android:backgroundTint="@color/glass_white_heavy"
-                    android:textColor="@color/white"
-                    android:visibility="gone" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:background="@drawable/glass_card_bg">
 
-    </LinearLayout>
-</ScrollView>
+                    <TextView
+                        android:id="@+id/tvCurrentTimerStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Status: Qapalı"
+                        android:textColor="@color/gold_primary"
+                        android:layout_marginBottom="16dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btnTimerOff"
+                            style="?android:attr/buttonStyleSmall"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="OFF"
+                            android:layout_marginEnd="4dp" />
+
+                        <Button
+                            android:id="@+id/btnTimer15"
+                            style="?android:attr/buttonStyleSmall"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="15 dk"
+                            android:layout_marginEnd="4dp" />
+
+                        <Button
+                            android:id="@+id/btnTimer30"
+                            style="?android:attr/buttonStyleSmall"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="30 dk"
+                            android:layout_marginEnd="4dp" />
+
+                        <Button
+                            android:id="@+id/btnTimer60"
+                            style="?android:attr/buttonStyleSmall"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="60 dk"
+                            android:layout_marginEnd="4dp" />
+
+                        <Button
+                            android:id="@+id/btnTimer120"
+                            style="?android:attr/buttonStyleSmall"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="120 dk" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- App Lock Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Təhlükəsizlik"
+                android:textColor="@color/text_secondary"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/bg_sidebar"
+                android:layout_marginBottom="40dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:background="@drawable/glass_card_bg">
+
+                    <CheckBox
+                        android:id="@+id/cbAppLock"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tətbiq Kilidini Aktiv Et"
+                        android:textColor="@color/white"
+                        android:buttonTint="@color/gold_primary" />
+
+                    <Button
+                        android:id="@+id/btnChangePin"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="PİN KODU DƏYİŞDİR"
+                        android:backgroundTint="@color/glass_white_heavy"
+                        android:textColor="@color/white"
+                        android:visibility="gone" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

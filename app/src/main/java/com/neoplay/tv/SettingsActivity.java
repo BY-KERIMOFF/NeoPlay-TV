@@ -41,6 +41,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
         
         binding.cbBootOnStartup.setChecked(prefs.getBoolean("boot_on_startup", false));
+        binding.cbAutoStartLast.setChecked(prefs.getBoolean("auto_start_last_channel", true));
         binding.etEpgUrl.setText(prefs.getString("manual_epg_url", ""));
 
         String pType = prefs.getString("player_type", "exo2");
@@ -53,6 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void setupListeners() {
         setupFocusEffect(binding.cbBootOnStartup);
+        setupFocusEffect(binding.cbAutoStartLast);
         setupFocusEffect(binding.rbExoStandard);
         setupFocusEffect(binding.rbExo2);
         setupFocusEffect(binding.btnRefreshData);
@@ -70,6 +72,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         binding.cbBootOnStartup.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean("boot_on_startup", isChecked).apply();
+            Toast.makeText(this, "Parametr yadda saxlanıldı", Toast.LENGTH_SHORT).show();
+        });
+
+        binding.cbAutoStartLast.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.edit().putBoolean("auto_start_last_channel", isChecked).apply();
             Toast.makeText(this, "Parametr yadda saxlanıldı", Toast.LENGTH_SHORT).show();
         });
 

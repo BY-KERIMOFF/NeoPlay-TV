@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.media3.common.MediaItem;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.ui.CaptionStyleCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.neoplay.tv.adapters.CategoryAdapter;
@@ -130,9 +131,17 @@ public class LiveTvActivity extends AppCompatActivity {
         
         androidx.media3.extractor.DefaultExtractorsFactory extractorsFactory = new androidx.media3.extractor.DefaultExtractorsFactory()
                 .setTsExtractorFlags(androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES 
-                                   | androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS);
+                                   | androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS
+                                   | androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_IGNORE_SPLICE_INFO_STREAM);
 
         androidx.media3.exoplayer.source.DefaultMediaSourceFactory mediaSourceFactory = new androidx.media3.exoplayer.source.DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory);
+
+        androidx.media3.exoplayer.trackselection.DefaultTrackSelector trackSelector = new androidx.media3.exoplayer.trackselection.DefaultTrackSelector(this);
+        trackSelector.setParameters(trackSelector.buildUponParameters()
+                .setExceedAudioConstraintsIfNecessary(true)
+                .setExceedRendererCapabilitiesIfNecessary(true)
+                .setExceedVideoConstraintsIfNecessary(true)
+        );
 
         // Geniş audio/video kodek dəstəyi (AC3, DTS və s. üçün)
         androidx.media3.exoplayer.DefaultRenderersFactory renderersFactory = new androidx.media3.exoplayer.DefaultRenderersFactory(this)
@@ -141,8 +150,25 @@ public class LiveTvActivity extends AppCompatActivity {
 
         miniPlayer = new ExoPlayer.Builder(this, renderersFactory)
                 .setMediaSourceFactory(mediaSourceFactory)
+                .setTrackSelector(trackSelector)
                 .build();
         binding.miniPlayerView.setPlayer(miniPlayer);
+
+        // Mini-player üçün altyazı stili
+        CaptionStyleCompat style = new CaptionStyleCompat(
+                android.graphics.Color.WHITE,
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT,
+                CaptionStyleCompat.EDGE_TYPE_OUTLINE,
+                android.graphics.Color.BLACK,
+                null
+        );
+        if (binding.miniPlayerView.getSubtitleView() != null) {
+            binding.miniPlayerView.getSubtitleView().setApplyEmbeddedStyles(false);
+            binding.miniPlayerView.getSubtitleView().setApplyEmbeddedFontSizes(false);
+            binding.miniPlayerView.getSubtitleView().setStyle(style);
+            binding.miniPlayerView.getSubtitleView().setFixedTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 18f);
+        }
     }
 
     private void setupRecyclerViews() {
@@ -224,10 +250,12 @@ public class LiveTvActivity extends AppCompatActivity {
         if (url != null) {
             builder.setUri(android.net.Uri.parse(url));
             String lower = url.toLowerCase(java.util.Locale.ROOT);
-            if (lower.contains("m3u8") || lower.contains("stream.php") || lower.contains(".php")) {
+            if (lower.contains("m3u8") || lower.contains("stream.php") || lower.contains(".php") || lower.contains("/hls/")) {
                 builder.setMimeType(androidx.media3.common.MimeTypes.APPLICATION_M3U8);
-            } else if (lower.contains(".ts") || lower.contains("output=ts") || lower.contains("output=mpegts")) {
+            } else if (lower.contains(".ts") || lower.contains("output=ts") || lower.contains("output=mpegts") || lower.contains("/live/") || lower.contains("/mpegts")) {
                 builder.setMimeType(androidx.media3.common.MimeTypes.VIDEO_MP2T);
+            } else if (lower.contains(".mpd")) {
+                builder.setMimeType(androidx.media3.common.MimeTypes.APPLICATION_MPD);
             }
         }
         miniPlayer.setMediaItem(builder.build());
@@ -568,6 +596,24 @@ public class LiveTvActivity extends AppCompatActivity {
     }
 
     private void handleStartCategory() {
+        boolean autoStart = getIntent().getBooleanExtra("auto_start", false);
+        if (autoStart) {
+            getIntent().removeExtra("auto_start"); // Təkrar işə düşməməsi üçün
+            SharedPreferences prefs = getSharedPreferences("neoplay_prefs", MODE_PRIVATE);
+            String lastUrl = prefs.getString("last_channel_url", "");
+            if (!lastUrl.isEmpty() && !allChannels.isEmpty()) {
+                for (int i = 0; i < allChannels.size(); i++) {
+                    if (allChannels.get(i).getStreamUrl().equals(lastUrl)) {
+                        DataManager.setCurrentChannelList(allChannels);
+                        Intent intent = new Intent(this, PlayerActivity.class);
+                        intent.putExtra("channel_index", i);
+                        startActivity(intent);
+                        return;
+                    }
+                }
+            }
+        }
+
         String filterCategory = getIntent().getStringExtra("filter_category");
         if (filterCategory != null) {
             if ("Sevimlilər".equals(filterCategory)) {

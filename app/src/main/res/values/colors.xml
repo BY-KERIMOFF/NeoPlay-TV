@@ -7,7 +7,9 @@
     <!-- Gold Accent Palette -->
     <color name="gold_primary">#FFD700</color>
     <color name="gold_dark">#B8860B</color>
-    <color name="item_focus_color">#FFD700</color>
+    <!-- Blue Focus Palette (Premium Look) -->
+    <color name="item_focus_color">#0078D4</color>
+    <color name="item_focus_border">#FFFFFF</color>
 
     <!-- Glass & Text Colors -->
     <color name="glass_white">#1AFFFFFF</color>

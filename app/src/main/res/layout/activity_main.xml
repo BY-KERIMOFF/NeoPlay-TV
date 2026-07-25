@@ -5,12 +5,18 @@
     android:layout_height="match_parent"
     android:background="@color/bg_main">
 
-    <!-- Premium Background Gradient/Image Placeholder -->
+    <!-- Panoramic Background -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/app_background"
+        android:scaleType="centerCrop" />
+
+    <!-- Dark Overlay for Readability -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/ic_launcher_background"
-        android:alpha="0.1" />
+        android:background="#99000000" />
 
     <!-- Loading State -->
     <LinearLayout
@@ -37,14 +43,16 @@
             style="@android:style/Widget.Material.ProgressBar.Small" />
 
         <TextView
-            android:id="@+id/tvSplashStatus"
+            android:id="@+id/tvEnjoyWatching"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text=""
+            android:layout_marginTop="24dp"
+            android:text="@string/enjoy_watching"
             android:textColor="@color/gold_primary"
-            android:alpha="0.8"
-            android:textSize="14sp" />
+            android:textSize="28sp"
+            android:textStyle="italic|bold"
+            android:visibility="invisible"
+            android:fontFamily="serif" />
     </LinearLayout>
 
     <!-- Main Dashboard -->

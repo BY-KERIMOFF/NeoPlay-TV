@@ -12,20 +12,28 @@
         app:use_controller="false"
         app:resize_mode="fill" />
 
-    <TextView
-        android:id="@+id/tvAnnouncement"
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:id="@+id/announcementContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="25dp"
-        android:padding="10dp"
-        android:textColor="@color/gold_primary"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:singleLine="true"
+        android:layout_marginBottom="10dp"
+        android:background="#80000000"
+        android:paddingVertical="4dp"
         android:visibility="gone"
-        android:elevation="200dp"
-        android:text="Neo Play TV" />
+        android:elevation="200dp">
+
+        <TextView
+            android:id="@+id/tvAnnouncement"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="10dp"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:singleLine="true"
+            android:text="Neo Play TV" />
+    </FrameLayout>
 
     <!-- Modernized OSD -->
     <LinearLayout
@@ -296,6 +304,7 @@
             app:tint="@color/gold_primary" />
 
         <TextView
+            android:id="@+id/tvErrorTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
@@ -308,6 +317,7 @@
             android:letterSpacing="0.05" />
 
         <TextView
+            android:id="@+id/tvErrorSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"

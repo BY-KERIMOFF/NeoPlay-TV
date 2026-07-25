@@ -26,6 +26,9 @@ public class UpdateManager {
     private static final String TAG = "UpdateManager";
     private static final String UPDATE_URL = "https://kanal65.xyz/neoplay/update.json";
     
+    public static boolean isUpdateFound = false; 
+    public static boolean isCheckFinished = false; 
+    
     private final Context context;
     private long downloadId = -1;
 
@@ -34,6 +37,8 @@ public class UpdateManager {
     }
 
     public void checkForUpdates() {
+        isCheckFinished = false;
+        isUpdateFound = false;
         new Thread(() -> {
             try {
                 Log.d(TAG, "Checking for updates...");
@@ -66,13 +71,17 @@ public class UpdateManager {
 
                 if (latestVersionCode > currentVersionCode) {
                     Log.d(TAG, "Update available: " + latestVersionName);
+                    isUpdateFound = true; // Bayrağı aktiv et
                     showUpdateDialog(latestVersionName, apkUrl, notes);
                 } else {
+                    isUpdateFound = false;
                     Log.d(TAG, "App is up to date");
                 }
+                isCheckFinished = true;
 
             } catch (Exception e) {
                 Log.e(TAG, "Update check failed: " + e.getMessage());
+                isCheckFinished = true;
             }
         }).start();
     }

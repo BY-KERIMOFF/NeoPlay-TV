@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -10,8 +11,8 @@ android {
         applicationId = "com.neoplay.tv"
         minSdk = 21
         targetSdk = 36
-        versionCode = 8
-        versionName = "1.0.7"
+        versionCode = 23
+        versionName = "1.2.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
@@ -33,6 +34,11 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        isCoreLibraryDesugaringEnabled = true
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
     
     buildFeatures {
@@ -50,6 +56,7 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -63,6 +70,7 @@ dependencies {
     implementation(libs.media3.hls)
     implementation(libs.media3.okhttp)
     implementation(libs.media3.rtsp)
+    implementation(libs.media3.ffmpeg)
     
     // Networking
     implementation(libs.retrofit.core)

@@ -23,6 +23,7 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
     private OnChannelClickListener listener;
     private FavoriteManager favoriteManager;
     private int currentViewType = VIEW_TYPE_LIST;
+    private int selectedPosition = -1;
 
     public interface OnChannelClickListener {
         void onChannelClick(Channel channel);
@@ -38,6 +39,13 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
     public void setViewType(int viewType) {
         this.currentViewType = viewType;
         notifyDataSetChanged();
+    }
+
+    public void setSelectedPosition(int position) {
+        int oldPos = selectedPosition;
+        this.selectedPosition = position;
+        notifyItemChanged(oldPos);
+        notifyItemChanged(selectedPosition);
     }
 
     @Override
@@ -71,6 +79,9 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
         boolean isFav = favoriteManager.isFavorite(channel.getId());
         holder.ivFavorite.setVisibility(isFav ? View.VISIBLE : View.GONE);
 
+        // Hazırda baxılan kanalın vizual seçilməsi
+        holder.itemView.setSelected(position == selectedPosition);
+
         holder.itemView.setOnClickListener(v -> listener.onChannelClick(channel));
         holder.itemView.setOnKeyListener((v, keyCode, event) -> {
             if (event.getAction() == android.view.KeyEvent.ACTION_DOWN && 
@@ -89,12 +100,10 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
             if (hasFocus) {
                 v.startAnimation(AnimationUtils.loadAnimation(v.getContext(), R.anim.scale_up));
                 v.setElevation(12f);
-                holder.tvName.setTextColor(androidx.core.content.ContextCompat.getColor(v.getContext(), R.color.gold_primary));
                 listener.onChannelFocus(channel);
             } else {
                 v.startAnimation(AnimationUtils.loadAnimation(v.getContext(), R.anim.scale_down));
                 v.setElevation(0f);
-                holder.tvName.setTextColor(androidx.core.content.ContextCompat.getColor(v.getContext(), R.color.white));
             }
         });
     }

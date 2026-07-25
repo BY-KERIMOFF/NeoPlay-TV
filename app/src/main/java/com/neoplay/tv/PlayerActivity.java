@@ -14,7 +14,10 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.media3.common.MediaItem;
+import androidx.media3.ui.CaptionStyleCompat;
+import androidx.media3.ui.SubtitleView;
 import androidx.media3.common.Player;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.common.util.UnstableApi;
@@ -76,7 +79,16 @@ public class PlayerActivity extends AppCompatActivity {
     };
     
     private int retryCount = 0;
-    private final int MAX_RETRIES = 3;
+    private final int MAX_RETRIES = 1;
+
+    private final Runnable bufferingTimeoutRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (exoPlayer != null && (exoPlayer.getPlaybackState() == Player.STATE_BUFFERING)) {
+                showErrorOverlay("Yayım Gecikir", "Kanal açılmır və ya internet zəifdir");
+            }
+        }
+    };
     
     private final Handler progressHandler = new Handler(Looper.getMainLooper());
     private final Runnable updateProgressRunnable = new Runnable() {
@@ -173,11 +185,13 @@ public class PlayerActivity extends AppCompatActivity {
         }
 
         if (announcement != null && !announcement.isEmpty()) {
-            binding.tvAnnouncement.setText(announcement);
-            binding.tvAnnouncement.setVisibility(View.VISIBLE);
+            // Yeni sətirləri təmizləyirik ki, lentdə tam görsənsin
+            String cleanAnnouncement = announcement.replace("\n", "  |  ");
+            binding.tvAnnouncement.setText(cleanAnnouncement);
+            binding.announcementContainer.setVisibility(View.VISIBLE);
             startAnnouncementAnimation();
         } else {
-            binding.tvAnnouncement.setVisibility(View.GONE);
+            binding.announcementContainer.setVisibility(View.GONE);
         }
     }
 
@@ -186,13 +200,13 @@ public class PlayerActivity extends AppCompatActivity {
             float screenWidth = getResources().getDisplayMetrics().widthPixels;
             float textWidth = binding.tvAnnouncement.getPaint().measureText(binding.tvAnnouncement.getText().toString());
             
-            // Animasiya: Sağdan sola
+            // Animasiya: Sağdan sola (Konteynerin içində)
             android.view.animation.TranslateAnimation animation = new android.view.animation.TranslateAnimation(
                     screenWidth, 
-                    -textWidth - 500, // Ekranda tam itənə qədər getsin
+                    -textWidth - 1000, // Tam itənə qədər getsin
                     0, 0);
             
-            animation.setDuration(15000); // Sürət: 15 saniyə (İstəyə görə dəyişmək olar)
+            animation.setDuration(25000); // Daha səliqəli və yavaş sürət
             animation.setRepeatCount(android.view.animation.Animation.INFINITE);
             animation.setInterpolator(new android.view.animation.LinearInterpolator());
             
@@ -299,7 +313,8 @@ public class PlayerActivity extends AppCompatActivity {
             // IPTV axınları üçün daha dözümlü Extractor sazlamaları
             androidx.media3.extractor.DefaultExtractorsFactory extractorsFactory = new androidx.media3.extractor.DefaultExtractorsFactory()
                     .setTsExtractorFlags(androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES 
-                                       | androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS)
+                                       | androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS
+                                       | androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_IGNORE_SPLICE_INFO_STREAM)
                     .setAdtsExtractorFlags(androidx.media3.extractor.ts.AdtsExtractor.FLAG_ENABLE_CONSTANT_BITRATE_SEEKING);
 
             DefaultMediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory);
@@ -307,6 +322,9 @@ public class PlayerActivity extends AppCompatActivity {
             DefaultTrackSelector trackSelector = new DefaultTrackSelector(this);
             trackSelector.setParameters(trackSelector.buildUponParameters()
                     .setPreferredAudioLanguage("az")
+                    .setExceedAudioConstraintsIfNecessary(true)
+                    .setExceedRendererCapabilitiesIfNecessary(true)
+                    .setExceedVideoConstraintsIfNecessary(true)
             );
 
             androidx.media3.common.AudioAttributes audioAttributes = new androidx.media3.common.AudioAttributes.Builder()
@@ -338,14 +356,34 @@ public class PlayerActivity extends AppCompatActivity {
                     .build();
 
             binding.playerView.setPlayer(exoPlayer);
+
+            // Altyazı stilini təyin et (Ağ mətn, Qara haşiyə)
+            CaptionStyleCompat style = new CaptionStyleCompat(
+                    android.graphics.Color.WHITE,
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT,
+                    CaptionStyleCompat.EDGE_TYPE_OUTLINE,
+                    android.graphics.Color.BLACK,
+                    null
+            );
+            if (binding.playerView.getSubtitleView() != null) {
+                binding.playerView.getSubtitleView().setApplyEmbeddedStyles(false);
+                binding.playerView.getSubtitleView().setApplyEmbeddedFontSizes(false);
+                binding.playerView.getSubtitleView().setStyle(style);
+                binding.playerView.getSubtitleView().setFixedTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 24f);
+            }
             
             exoPlayer.addListener(new Player.Listener() {
                 @Override
                 public void onPlaybackStateChanged(int playbackState) {
                     if (playbackState == Player.STATE_BUFFERING) {
                         binding.bufferingProgress.setVisibility(View.VISIBLE);
+                        // 10 saniyəlik yüklənmə taymautu
+                        osdHandler.removeCallbacks(bufferingTimeoutRunnable);
+                        osdHandler.postDelayed(bufferingTimeoutRunnable, 10000);
                     } else {
                         binding.bufferingProgress.setVisibility(View.GONE);
+                        osdHandler.removeCallbacks(bufferingTimeoutRunnable);
                         if (playbackState == Player.STATE_READY) {
                             binding.errorLayout.setVisibility(View.GONE);
                             binding.errorLayout.clearAnimation();
@@ -357,27 +395,22 @@ public class PlayerActivity extends AppCompatActivity {
                 @Override
                 public void onPlayerError(@NonNull androidx.media3.common.PlaybackException error) {
                     binding.bufferingProgress.setVisibility(View.GONE);
-                    binding.errorLayout.setVisibility(View.GONE); // Retry zamanı xətanı gizlət
+                    binding.errorLayout.setVisibility(View.GONE); 
+                    osdHandler.removeCallbacks(bufferingTimeoutRunnable);
                     
                     if (retryCount < MAX_RETRIES) {
                         retryCount++;
-                        binding.tvEpgInfo.setText("Xəta, yenidən yoxlanılır (" + retryCount + "/" + MAX_RETRIES + ")...");
+                        binding.tvEpgInfo.setText("Yenidən yoxlanılır (" + retryCount + "/" + MAX_RETRIES + ")...");
                         binding.osdLayout.setVisibility(View.VISIBLE);
                         
                         osdHandler.postDelayed(() -> {
-                            if (exoPlayer != null && channelList != null && !channelList.isEmpty()) {
+                            if (exoPlayer != null) {
                                 exoPlayer.prepare();
                                 exoPlayer.play();
                             }
-                        }, 2500);
+                        }, 1500); // Daha sürətli təkrar yoxlama
                     } else {
-                        // Tam ekran xəta mesajını göstər
-                        binding.errorLayout.setVisibility(View.VISIBLE);
-                        binding.errorLayout.startAnimation(android.view.animation.AnimationUtils.loadAnimation(PlayerActivity.this, R.anim.pulse));
-                        
-                        binding.osdLayout.setVisibility(View.GONE); // Digər panelləri gizlə
-                        binding.volumeLayout.setVisibility(View.GONE);
-                        binding.tvEpgInfo.setText("Müvəqqəti texniki nasazlıq");
+                        showErrorOverlay("Müvəqqəti texniki nasazlıq", "Yayım tezliklə bərpa olunacaq");
                     }
                 }
             });
@@ -388,6 +421,7 @@ public class PlayerActivity extends AppCompatActivity {
         if (exoPlayer == null) initExoPlayer(playerType);
         
         retryCount = 0; // Retry sayını sıfırla
+        osdHandler.removeCallbacks(bufferingTimeoutRunnable);
         binding.errorLayout.setVisibility(View.GONE);
         binding.errorLayout.clearAnimation();
         
@@ -399,11 +433,13 @@ public class PlayerActivity extends AppCompatActivity {
         if (url != null) {
             mediaItemBuilder.setUri(Uri.parse(url));
             String lower = url.toLowerCase(Locale.ROOT);
-            if (lower.contains("m3u8") || lower.contains("stream.php") || lower.contains(".php")) {
+            if (lower.contains("m3u8") || lower.contains("stream.php") || lower.contains(".php") || lower.contains("/hls/")) {
                 mediaItemBuilder.setMimeType(androidx.media3.common.MimeTypes.APPLICATION_M3U8);
-            } else if (lower.contains(".ts") || lower.contains("output=ts") || lower.contains("output=mpegts") || lower.contains("/live/")) {
+            } else if (lower.contains(".ts") || lower.contains("output=ts") || lower.contains("output=mpegts") || lower.contains("/live/") || lower.contains("/mpegts")) {
                 // MPEG-TS formatı bir çox canlı yayımda istifadə olunur və AC3 səs bu formatdadır
                 mediaItemBuilder.setMimeType(androidx.media3.common.MimeTypes.VIDEO_MP2T);
+            } else if (lower.contains(".mpd")) {
+                mediaItemBuilder.setMimeType(androidx.media3.common.MimeTypes.APPLICATION_MPD);
             }
         }
 
@@ -438,6 +474,17 @@ public class PlayerActivity extends AppCompatActivity {
             quality = "HD";
         }
         binding.tvQuality.setText(quality);
+
+        if (channelAdapter != null) {
+            channelAdapter.setSelectedPosition(currentIndex);
+        }
+
+        // Son baxılan kanalı yadda saxla
+        getSharedPreferences("neoplay_prefs", MODE_PRIVATE)
+                .edit()
+                .putString("last_channel_url", channel.getStreamUrl())
+                .putString("last_channel_id", channel.getId())
+                .apply();
 
         fetchEpg(channel.getId());
         showOsd();
@@ -540,7 +587,15 @@ public class PlayerActivity extends AppCompatActivity {
                 } else {
                     binding.playerChannelSidebar.setVisibility(View.VISIBLE);
                     binding.rvPlayerChannels.scrollToPosition(currentIndex);
-                    binding.rvPlayerChannels.requestFocus();
+                    // Fokusun dərhal baxılan kanala düşməsi üçün kiçik gecikmə ilə müraciət edirik
+                    binding.rvPlayerChannels.postDelayed(() -> {
+                        RecyclerView.ViewHolder vh = binding.rvPlayerChannels.findViewHolderForAdapterPosition(currentIndex);
+                        if (vh != null) {
+                            vh.itemView.requestFocus();
+                        } else {
+                            binding.rvPlayerChannels.requestFocus();
+                        }
+                    }, 50);
                 }
                 return true;
             case KeyEvent.KEYCODE_DPAD_LEFT:
@@ -666,6 +721,19 @@ public class PlayerActivity extends AppCompatActivity {
         if (exoPlayer != null) {
             exoPlayer.release();
         }
+    }
+
+    private void showErrorOverlay(String title, String subtitle) {
+        binding.errorLayout.setVisibility(View.VISIBLE);
+        binding.errorLayout.startAnimation(android.view.animation.AnimationUtils.loadAnimation(PlayerActivity.this, R.anim.pulse));
+        
+        binding.osdLayout.setVisibility(View.GONE);
+        binding.volumeLayout.setVisibility(View.GONE);
+        binding.bufferingProgress.setVisibility(View.GONE);
+        
+        binding.tvErrorTitle.setText(title.toUpperCase(Locale.ROOT));
+        binding.tvErrorSubtitle.setText(subtitle);
+        binding.tvEpgInfo.setText(title);
     }
 
     private void showOsd() {
