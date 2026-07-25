@@ -333,4 +333,21 @@
         android:elevation="30dp"
         android:text="0" />
 
+    <!-- Görüntü Rejimi Bildirişi -->
+    <TextView
+        android:id="@+id/tvAspectRatioStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="100dp"
+        android:background="@drawable/glass_card_bg"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp"
+        android:textColor="@color/gold_primary"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:elevation="50dp"
+        android:text="Görüntü: Tam Ekran" />
+
 </FrameLayout>

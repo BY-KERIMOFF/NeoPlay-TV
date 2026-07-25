@@ -43,6 +43,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        SharedPreferences prefs = getSharedPreferences("neoplay_prefs", MODE_PRIVATE);
+        boolean lockEnabled = prefs.getBoolean("app_lock_enabled", false);
+        boolean isAlreadyUnlocked = getIntent().getBooleanExtra("is_unlocked", false);
+
+        if (lockEnabled && !isAlreadyUnlocked) {
+            startActivity(new Intent(this, LockActivity.class));
+            finish();
+            return;
+        }
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

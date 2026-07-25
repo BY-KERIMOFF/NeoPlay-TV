@@ -36,6 +36,7 @@
 
     <!-- Panel 2: Channels -->
     <LinearLayout
+        android:id="@+id/panelChannels"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="2.8"
@@ -52,6 +53,7 @@
             android:padding="8dp">
 
             <TextView
+                android:id="@+id/tvPanelTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -78,11 +80,14 @@
             android:id="@+id/rvChannels"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:focusable="true" />
+            android:focusable="true"
+            android:clipToPadding="false"
+            android:padding="8dp" />
     </LinearLayout>
 
     <!-- Panel 3: Mini Player & EPG -->
     <LinearLayout
+        android:id="@+id/panelPlayer"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="3.4"

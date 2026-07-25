@@ -58,6 +58,7 @@ public class LiveTvActivity extends AppCompatActivity {
     private final List<Channel> allChannels = new ArrayList<>();
     private final Map<String, List<Channel>> channelMap = new HashMap<>();
     
+    private boolean isVodMode = false;
     private String playlistType;
     private String m3uUrl;
     private String xtHost, xtUser, xtPass;
@@ -147,11 +148,13 @@ public class LiveTvActivity extends AppCompatActivity {
     private void setupRecyclerViews() {
         categoryAdapter = new CategoryAdapter(categories, category -> {
             if ("Sevimlilər".equals(category.getName())) {
+                setVodMode(false);
                 loadFavorites();
             } else if (M3UParser.isSensitiveCategory(category.getName())) {
                 PinDialog.show(this, new PinDialog.PinListener() {
                     @Override
                     public void onSuccess() {
+                        checkAndSetVodMode(category);
                         filterChannelsByCategory(category);
                     }
 
@@ -159,6 +162,7 @@ public class LiveTvActivity extends AppCompatActivity {
                     public void onCancel() {}
                 });
             } else {
+                checkAndSetVodMode(category);
                 filterChannelsByCategory(category);
             }
             binding.rvChannels.requestFocus();
@@ -178,7 +182,9 @@ public class LiveTvActivity extends AppCompatActivity {
 
             @Override
             public void onChannelFocus(Channel channel) {
-                playMiniStream(channel);
+                if (!isVodMode) {
+                    playMiniStream(channel);
+                }
             }
 
             @Override
@@ -567,6 +573,7 @@ public class LiveTvActivity extends AppCompatActivity {
             if ("Sevimlilər".equals(filterCategory)) {
                 loadFavorites();
             } else if ("VOD_MOVIES".equals(filterCategory) || "VOD_SERIES".equals(filterCategory)) {
+                setVodMode(true);
                 loadVodContent();
             } else {
                 for (Category cat : categories) {
@@ -575,10 +582,46 @@ public class LiveTvActivity extends AppCompatActivity {
                         return;
                     }
                 }
+                setVodMode(true);
                 loadVodContent();
             }
         } else if (!categories.isEmpty()) {
+            setVodMode(false);
             filterChannelsByCategory(categories.get(0));
+        }
+    }
+
+    private void checkAndSetVodMode(Category category) {
+        String key = "xtream".equalsIgnoreCase(playlistType) ? category.getId() : category.getName();
+        List<Channel> list = channelMap.get(key);
+        if (list != null && !list.isEmpty()) {
+            setVodMode(M3UParser.isVodChannel(list.get(0).getStreamUrl()));
+        } else {
+            setVodMode(false);
+        }
+    }
+
+    private void setVodMode(boolean enabled) {
+        this.isVodMode = enabled;
+        if (enabled) {
+            binding.rvChannels.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(this, 5));
+            channelAdapter.setViewType(com.neoplay.tv.adapters.ChannelAdapter.VIEW_TYPE_GRID);
+            binding.panelPlayer.setVisibility(android.view.View.GONE);
+            binding.tvPanelTitle.setText("FILMLƏR / SERIALYAR");
+            if (miniPlayer != null && miniPlayer.isPlaying()) {
+                miniPlayer.stop();
+            }
+            android.widget.LinearLayout.LayoutParams params = (android.widget.LinearLayout.LayoutParams) binding.panelChannels.getLayoutParams();
+            params.weight = 6.2f;
+            binding.panelChannels.setLayoutParams(params);
+        } else {
+            binding.rvChannels.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
+            channelAdapter.setViewType(com.neoplay.tv.adapters.ChannelAdapter.VIEW_TYPE_LIST);
+            binding.panelPlayer.setVisibility(android.view.View.VISIBLE);
+            binding.tvPanelTitle.setText("KANALLAR");
+            android.widget.LinearLayout.LayoutParams params = (android.widget.LinearLayout.LayoutParams) binding.panelChannels.getLayoutParams();
+            params.weight = 2.8f;
+            binding.panelChannels.setLayoutParams(params);
         }
     }
 

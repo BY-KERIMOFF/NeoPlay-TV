@@ -40,6 +40,10 @@
         </activity>
 
         <activity
+            android:name=".LockActivity"
+            android:screenOrientation="landscape" />
+
+        <activity
             android:name=".LiveTvActivity"
             android:screenOrientation="landscape" />
 

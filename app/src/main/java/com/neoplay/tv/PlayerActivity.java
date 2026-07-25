@@ -105,6 +105,7 @@ public class PlayerActivity extends AppCompatActivity {
     private ChannelAdapter channelAdapter;
     private List<Channel> allCategoryChannels = new ArrayList<>();
     private String currentPlaylistType = "m3u";
+    private int currentResizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FILL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -306,20 +307,24 @@ public class PlayerActivity extends AppCompatActivity {
             DefaultTrackSelector trackSelector = new DefaultTrackSelector(this);
             trackSelector.setParameters(trackSelector.buildUponParameters()
                     .setPreferredAudioLanguage("az")
-                    .setForceHighestSupportedBitrate(false) // Stabil səs üçün
             );
+
+            androidx.media3.common.AudioAttributes audioAttributes = new androidx.media3.common.AudioAttributes.Builder()
+                    .setUsage(androidx.media3.common.C.USAGE_MEDIA)
+                    .setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_MOVIE)
+                    .build();
 
             // Daha mükəmməl buferləmə ayarları
             androidx.media3.exoplayer.DefaultLoadControl loadControl = new androidx.media3.exoplayer.DefaultLoadControl.Builder()
                     .setBufferDurationsMs(
-                            15000, // minBufferMs (donmamaq üçün bufer)
+                            15000, // minBufferMs
                             50000, // maxBufferMs
                             1500,  // bufferForPlaybackMs
                             2500   // bufferForPlaybackAfterRebufferMs
                     )
                     .build();
 
-            // Bütün audio kodekləri (AC3, AAC və s.) üçün render üstünlüyü və fallback
+            // AC3, DTS, AAC və digər multi-kanal səslər üçün dekoder prioriteti və fallback
             androidx.media3.exoplayer.DefaultRenderersFactory renderersFactory = new androidx.media3.exoplayer.DefaultRenderersFactory(this)
                     .setExtensionRendererMode(androidx.media3.exoplayer.DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
                     .setEnableDecoderFallback(true);
@@ -328,6 +333,8 @@ public class PlayerActivity extends AppCompatActivity {
                     .setMediaSourceFactory(mediaSourceFactory)
                     .setTrackSelector(trackSelector)
                     .setLoadControl(loadControl)
+                    .setAudioAttributes(audioAttributes, true)
+                    .setHandleAudioBecomingNoisy(true)
                     .build();
 
             binding.playerView.setPlayer(exoPlayer);
@@ -596,6 +603,10 @@ public class PlayerActivity extends AppCompatActivity {
                 // Səsin dəyişməsini gözləmək üçün kiçik gecikmə ilə UI-ı yenilə
                 osdHandler.postDelayed(this::updateVolumeUI, 50);
                 return super.onKeyDown(keyCode, event);
+            case KeyEvent.KEYCODE_PROG_YELLOW:
+            case KeyEvent.KEYCODE_Y:
+                toggleAspectRatio();
+                return true;
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -696,4 +707,37 @@ public class PlayerActivity extends AppCompatActivity {
         channelNumberInput = "";
         binding.tvNumericInput.setVisibility(View.GONE);
     }
+
+    @OptIn(markerClass = UnstableApi.class)
+    private void toggleAspectRatio() {
+        String modeName;
+        switch (currentResizeMode) {
+            case androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT:
+                currentResizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FILL;
+                modeName = "Tam Ekran (Fill)";
+                break;
+            case androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FILL:
+                currentResizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM;
+                modeName = "Yaxınlaşdır (Zoom)";
+                break;
+            case androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM:
+            default:
+                currentResizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT;
+                modeName = "Orijinal (Fit)";
+                break;
+        }
+
+        binding.playerView.setResizeMode(currentResizeMode);
+        showAspectRatioStatus(modeName);
+    }
+
+    private void showAspectRatioStatus(String modeName) {
+        binding.tvAspectRatioStatus.setText("Görüntü: " + modeName);
+        binding.tvAspectRatioStatus.setVisibility(View.VISIBLE);
+        
+        osdHandler.removeCallbacks(aspectRatioHideRunnable);
+        osdHandler.postDelayed(aspectRatioHideRunnable, 2500);
+    }
+
+    private final Runnable aspectRatioHideRunnable = () -> binding.tvAspectRatioStatus.setVisibility(View.GONE);
 }

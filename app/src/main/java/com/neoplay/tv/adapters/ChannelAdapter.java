@@ -16,9 +16,13 @@ import com.neoplay.tv.utils.FavoriteManager;
 import java.util.List;
 
 public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHolder> {
+    public static final int VIEW_TYPE_LIST = 0;
+    public static final int VIEW_TYPE_GRID = 1;
+
     private List<Channel> channels;
     private OnChannelClickListener listener;
     private FavoriteManager favoriteManager;
+    private int currentViewType = VIEW_TYPE_LIST;
 
     public interface OnChannelClickListener {
         void onChannelClick(Channel channel);
@@ -31,10 +35,21 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
         this.listener = listener;
     }
 
+    public void setViewType(int viewType) {
+        this.currentViewType = viewType;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return currentViewType;
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_channel, parent, false);
+        int layoutId = (viewType == VIEW_TYPE_GRID) ? R.layout.item_vod : R.layout.item_channel;
+        View view = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
         return new ViewHolder(view);
     }
 
@@ -55,7 +70,6 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
 
         boolean isFav = favoriteManager.isFavorite(channel.getId());
         holder.ivFavorite.setVisibility(isFav ? View.VISIBLE : View.GONE);
-        holder.ivFavorite.setImageResource(android.R.drawable.btn_star_big_on);
 
         holder.itemView.setOnClickListener(v -> listener.onChannelClick(channel));
         holder.itemView.setOnKeyListener((v, keyCode, event) -> {
@@ -74,9 +88,13 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
         holder.itemView.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
                 v.startAnimation(AnimationUtils.loadAnimation(v.getContext(), R.anim.scale_up));
+                v.setElevation(12f);
+                holder.tvName.setTextColor(androidx.core.content.ContextCompat.getColor(v.getContext(), R.color.gold_primary));
                 listener.onChannelFocus(channel);
             } else {
                 v.startAnimation(AnimationUtils.loadAnimation(v.getContext(), R.anim.scale_down));
+                v.setElevation(0f);
+                holder.tvName.setTextColor(androidx.core.content.ContextCompat.getColor(v.getContext(), R.color.white));
             }
         });
     }

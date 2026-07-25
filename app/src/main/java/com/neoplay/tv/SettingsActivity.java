@@ -64,11 +64,27 @@ public class SettingsActivity extends AppCompatActivity {
         setupFocusEffect(binding.btnTimer30);
         setupFocusEffect(binding.btnTimer60);
         setupFocusEffect(binding.btnTimer120);
+        
+        setupFocusEffect(binding.cbAppLock);
+        setupFocusEffect(binding.btnChangePin);
 
         binding.cbBootOnStartup.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean("boot_on_startup", isChecked).apply();
             Toast.makeText(this, "Parametr yadda saxlanıldı", Toast.LENGTH_SHORT).show();
         });
+
+        binding.cbAppLock.setChecked(prefs.getBoolean("app_lock_enabled", false));
+        binding.btnChangePin.setVisibility(binding.cbAppLock.isChecked() ? View.VISIBLE : View.GONE);
+
+        binding.cbAppLock.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked && prefs.getString("app_pin", "0000").equals("0000")) {
+                Toast.makeText(this, "Lütfən PİN kodu dəyişməyi unutmayın (Default: 0000)", Toast.LENGTH_LONG).show();
+            }
+            prefs.edit().putBoolean("app_lock_enabled", isChecked).apply();
+            binding.btnChangePin.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        });
+
+        binding.btnChangePin.setOnClickListener(v -> showChangePinDialog());
 
         binding.rgPlayerChoice.setOnCheckedChangeListener((group, checkedId) -> {
             String type = (checkedId == R.id.rbExoStandard) ? "standard" : "exo2";
@@ -108,6 +124,28 @@ public class SettingsActivity extends AppCompatActivity {
             manager.startTimer(minutes, this);
             binding.tvCurrentTimerStatus.setText("Status: Aktiv (" + minutes + " dəq)");
         }
+    }
+
+    private void showChangePinDialog() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert);
+        builder.setTitle("PİN Kodu Dəyişdir");
+        
+        final android.widget.EditText input = new android.widget.EditText(this);
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+        input.setHint("Yeni 4 rəqəmli PİN");
+        
+        builder.setView(input);
+        builder.setPositiveButton("YADDA SAXLA", (dialog, which) -> {
+            String newPin = input.getText().toString();
+            if (newPin.length() == 4) {
+                prefs.edit().putString("app_pin", newPin).apply();
+                Toast.makeText(this, "PİN kod uğurla dəyişdirildi", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "PİN 4 rəqəmli olmalıdır!", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("LƏĞV ET", null);
+        builder.show();
     }
 
     private void setupFocusEffect(View view) {
