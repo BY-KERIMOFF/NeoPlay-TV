@@ -25,7 +25,8 @@ Tətbiq daxilində məzmunun (kanalların) yayımı üçün istifadə edilən xa
 Məlumatlarınızın təhlükəsizliyini qorumaq üçün standart şifrələmə üsullarından istifadə edirik. Lakin internet üzərindən ötürülən heç bir məlumatın 100% təhlükəsizliyinə zəmanət verilə bilməz.
 
 ## 6. Əlaqə
-Məxfilik siyasəti ilə bağlı suallarınız olarsa, bizimlə əlaqə saxlaya bilərsiniz.
+Məxfilik siyasəti ilə bağlı suallarınız olarsa, bizimlə əlaqə saxlaya bilərsiniz:
+*   **E-poçt:** tebrizkerimli8794@gmail.com
 
 ---
 Bu sənəd tətbiqin istifadəçiləri üçün şəffaflığı təmin etmək məqsədilə hazırlanmışdır.
