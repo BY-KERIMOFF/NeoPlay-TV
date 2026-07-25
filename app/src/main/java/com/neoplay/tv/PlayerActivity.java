@@ -34,14 +34,18 @@ import javax.net.ssl.X509TrustManager;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.bumptech.glide.Glide;
+import com.neoplay.tv.adapters.ArchiveAdapter;
 import com.neoplay.tv.adapters.CategoryAdapter;
 import com.neoplay.tv.adapters.ChannelAdapter;
 import com.neoplay.tv.api.ApiClient;
 import com.neoplay.tv.databinding.ActivityPlayerBinding;
 import com.neoplay.tv.models.Category;
 import com.neoplay.tv.models.Channel;
+import com.neoplay.tv.models.EpgProgram;
 import com.neoplay.tv.models.XtreamEpg;
 import com.neoplay.tv.utils.DataManager;
 import com.neoplay.tv.utils.FavoriteManager;
@@ -118,6 +122,9 @@ public class PlayerActivity extends AppCompatActivity {
     private List<Channel> allCategoryChannels = new ArrayList<>();
     private String currentPlaylistType = "m3u";
     private int currentResizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FILL;
+    
+    private List<EpgProgram> archiveList = new ArrayList<>();
+    private com.neoplay.tv.adapters.ArchiveAdapter archiveAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +145,7 @@ public class PlayerActivity extends AppCompatActivity {
         setupPlayerChannelList();
         setupPlayerCategoryList();
         setupPlayerSearch();
+        setupArchiveList();
         
         progressHandler.post(updateProgressRunnable);
 
@@ -161,6 +169,8 @@ public class PlayerActivity extends AppCompatActivity {
                     binding.rvPlayerCategories.setVisibility(View.GONE);
                 } else if (binding.playerChannelSidebar.getVisibility() == View.VISIBLE) {
                     binding.playerChannelSidebar.setVisibility(View.GONE);
+                } else if (binding.playerArchiveSidebar.getVisibility() == View.VISIBLE) {
+                    binding.playerArchiveSidebar.setVisibility(View.GONE);
                 } else {
                     setEnabled(false);
                     onBackPressed();
@@ -290,6 +300,74 @@ public class PlayerActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(android.text.Editable s) {}
         });
+    }
+
+    private void setupArchiveList() {
+        archiveAdapter = new com.neoplay.tv.adapters.ArchiveAdapter(archiveList, program -> {
+            playArchiveProgram(program);
+            binding.playerArchiveSidebar.setVisibility(View.GONE);
+        });
+        binding.rvArchive.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
+        binding.rvArchive.setAdapter(archiveAdapter);
+    }
+
+    private void playArchiveProgram(EpgProgram program) {
+        if (channelList == null || currentIndex < 0 || currentIndex >= channelList.size()) return;
+        Channel channel = channelList.get(currentIndex);
+        
+        String baseUrl = channel.getStreamUrl();
+        // Xtream format: http://host/live/user/pass/stream_id.m3u8
+        // Archive format: http://host/timeshift/user/pass/duration/start_time/stream_id.m3u8
+        
+        if (currentPlaylistType.equalsIgnoreCase("xtream")) {
+            try {
+                SharedPreferences prefs = getSharedPreferences("neoplay_prefs", MODE_PRIVATE);
+                String host = prefs.getString("xtream_host", "");
+                String user = prefs.getString("xtream_user", "");
+                String pass = prefs.getString("xtream_pass", "");
+                
+                String startTimeStr = new SimpleDateFormat("yyyy-MM-dd:HH-mm", Locale.US).format(new Date(program.getStartTime()));
+                int durationMinutes = (int) ((program.getEndTime() - program.getStartTime()) / 60000);
+                
+                String archiveUrl = host + "/timeshift/" + user + "/" + pass + "/" + durationMinutes + "/" + startTimeStr + "/" + channel.getId() + ".ts";
+                
+                if (exoPlayer == null) initExoPlayer(playerType);
+                exoPlayer.stop();
+                exoPlayer.clearMediaItems();
+                exoPlayer.setMediaItem(androidx.media3.common.MediaItem.fromUri(archiveUrl));
+                exoPlayer.prepare();
+                exoPlayer.play();
+                
+                binding.tvEpgInfo.setText("ARXİV: " + program.getTitle());
+                binding.tvQuality.setText("ARXİV");
+                binding.vodProgressLayout.setVisibility(View.VISIBLE);
+                showOsd();
+                
+            } catch (Exception e) {
+                showErrorOverlay("Arxiv xətası", "Yayım başladıla bilmədi");
+            }
+        } else {
+            // M3U catchup support (simplified Default/Shift)
+            String catchupUrl = channel.getCatchupSource();
+            if (catchupUrl == null || catchupUrl.isEmpty()) catchupUrl = baseUrl;
+            
+            // Zaman ştamplarını yerləşdir
+            long startUnix = program.getStartTime() / 1000;
+            String finalUrl = catchupUrl.replace("${start}", String.valueOf(startUnix))
+                                        .replace("{utc}", String.valueOf(startUnix))
+                                        .replace("${offset}", "0");
+            
+            if (exoPlayer == null) initExoPlayer(playerType);
+            exoPlayer.stop();
+            exoPlayer.clearMediaItems();
+            exoPlayer.setMediaItem(androidx.media3.common.MediaItem.fromUri(finalUrl));
+            exoPlayer.prepare();
+            exoPlayer.play();
+            
+            binding.tvEpgInfo.setText("ARXİV: " + program.getTitle());
+            binding.vodProgressLayout.setVisibility(View.VISIBLE);
+            showOsd();
+        }
     }
 
     private void filterChannels(String query) {
@@ -427,6 +505,7 @@ public class PlayerActivity extends AppCompatActivity {
         
         exoPlayer.stop();
         exoPlayer.clearMediaItems();
+        binding.vodProgressLayout.setVisibility(View.GONE); // Live TV-də progress barı gizlə
 
         String url = channel.getStreamUrl();
         MediaItem.Builder mediaItemBuilder = new MediaItem.Builder();
@@ -578,24 +657,8 @@ public class PlayerActivity extends AppCompatActivity {
             case KeyEvent.KEYCODE_DPAD_CENTER:
             case KeyEvent.KEYCODE_ENTER:
             case KeyEvent.KEYCODE_NUMPAD_ENTER:
-                if (binding.playerChannelSidebar.getVisibility() == View.VISIBLE) {
-                    if (binding.etPlayerSearch.hasFocus()) {
-                        // Axtarış yerindədirsə, klaviaturanı açmaq üçün default davranışı saxla
-                        return super.onKeyDown(keyCode, event);
-                    }
-                    binding.playerChannelSidebar.setVisibility(View.GONE);
-                } else {
-                    binding.playerChannelSidebar.setVisibility(View.VISIBLE);
-                    binding.rvPlayerChannels.scrollToPosition(currentIndex);
-                    // Fokusun dərhal baxılan kanala düşməsi üçün kiçik gecikmə ilə müraciət edirik
-                    binding.rvPlayerChannels.postDelayed(() -> {
-                        RecyclerView.ViewHolder vh = binding.rvPlayerChannels.findViewHolderForAdapterPosition(currentIndex);
-                        if (vh != null) {
-                            vh.itemView.requestFocus();
-                        } else {
-                            binding.rvPlayerChannels.requestFocus();
-                        }
-                    }, 50);
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    event.startTracking();
                 }
                 return true;
             case KeyEvent.KEYCODE_DPAD_LEFT:
@@ -641,6 +704,9 @@ public class PlayerActivity extends AppCompatActivity {
                     }
                     return super.onKeyDown(keyCode, event);
                 }
+                if (binding.playerArchiveSidebar.getVisibility() == View.VISIBLE) {
+                    return super.onKeyDown(keyCode, event);
+                }
                 playNextChannel();
                 return true;
             case KeyEvent.KEYCODE_DPAD_DOWN:
@@ -649,6 +715,9 @@ public class PlayerActivity extends AppCompatActivity {
                         binding.rvPlayerChannels.requestFocus();
                         return true;
                     }
+                    return super.onKeyDown(keyCode, event);
+                }
+                if (binding.playerArchiveSidebar.getVisibility() == View.VISIBLE) {
                     return super.onKeyDown(keyCode, event);
                 }
                 playPreviousChannel();
@@ -664,6 +733,99 @@ public class PlayerActivity extends AppCompatActivity {
                 return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) {
+            showArchiveSidebar();
+            return true;
+        }
+        return super.onKeyLongPress(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) {
+            if (event.isTracking() && !event.isCanceled()) {
+                // Bu qısa basmadır (çünki uzun basma olsa isCanceled true olar və ya longPress işləyər)
+                toggleChannelSidebar();
+            }
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
+    }
+
+    private void toggleChannelSidebar() {
+        if (binding.playerChannelSidebar.getVisibility() == View.VISIBLE) {
+            if (binding.etPlayerSearch.hasFocus()) {
+                // Axtarış yerindədirsə, klaviaturanı açmaq üçün default davranışı saxla
+                return;
+            }
+            binding.playerChannelSidebar.setVisibility(View.GONE);
+        } else {
+            binding.playerChannelSidebar.setVisibility(View.VISIBLE);
+            binding.rvPlayerChannels.scrollToPosition(currentIndex);
+            binding.rvPlayerChannels.postDelayed(() -> {
+                RecyclerView.ViewHolder vh = binding.rvPlayerChannels.findViewHolderForAdapterPosition(currentIndex);
+                if (vh != null) vh.itemView.requestFocus();
+                else binding.rvPlayerChannels.requestFocus();
+            }, 50);
+        }
+    }
+
+    private void showArchiveSidebar() {
+        if (channelList == null || currentIndex < 0 || currentIndex >= channelList.size()) return;
+        Channel channel = channelList.get(currentIndex);
+        
+        binding.playerArchiveSidebar.setVisibility(View.VISIBLE);
+        binding.playerChannelSidebar.setVisibility(View.GONE);
+        binding.rvPlayerCategories.setVisibility(View.GONE);
+        
+        binding.tvArchiveTitle.setText("ARXİV: " + channel.getName());
+        
+        fetchArchiveEpg(channel);
+    }
+
+    private void fetchArchiveEpg(Channel channel) {
+        archiveList.clear();
+        archiveAdapter.notifyDataSetChanged();
+        
+        if (currentPlaylistType.equalsIgnoreCase("xtream")) {
+            SharedPreferences prefs = getSharedPreferences("neoplay_prefs", MODE_PRIVATE);
+            String host = prefs.getString("xtream_host", "");
+            String user = prefs.getString("xtream_user", "");
+            String pass = prefs.getString("xtream_pass", "");
+            
+            String url = host + "/player_api.php?username=" + user + "&password=" + pass + "&action=get_short_epg&stream_id=" + channel.getId();
+            
+            ApiClient.getService().getXtreamEpg(url).enqueue(new Callback<XtreamEpg>() {
+                @Override
+                public void onResponse(Call<XtreamEpg> call, Response<XtreamEpg> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().getListings() != null) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+                        for (XtreamEpg.EpgListing listing : response.body().getListings()) {
+                            try {
+                                long start = sdf.parse(listing.start).getTime();
+                                long end = sdf.parse(listing.stop).getTime();
+                                archiveList.add(new EpgProgram(listing.title, start, end, "", true));
+                            } catch (Exception ignored) {}
+                        }
+                        // Siyahını tərsinə düzək (ən yeni birinci)
+                        java.util.Collections.reverse(archiveList);
+                        archiveAdapter.notifyDataSetChanged();
+                        binding.rvArchive.requestFocus();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<XtreamEpg> call, Throwable t) {}
+            });
+        } else {
+            // M3U üçün XMLTV cache-dən və ya günlərdən istifadə etmək olar
+            // Hələlik boş saxlayırıq və ya sadə mesaj veririk
+            binding.tvArchiveTitle.setText("Arxiv dəstəklənmir (M3U)");
+        }
     }
 
     private void playNextChannel() {

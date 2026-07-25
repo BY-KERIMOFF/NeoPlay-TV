@@ -38,6 +38,8 @@ class MainActivity : AppCompatActivity() {
     private var retryCount = 0
     private val MAX_RETRIES = 3
     private var deviceMac: String? = null
+    private var isSplashFinished = false
+    private var pendingAuthResponse: ApiResponse? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,7 +73,7 @@ class MainActivity : AppCompatActivity() {
     private fun startSplashAnimation() {
         val fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in)
         val pulse = AnimationUtils.loadAnimation(this, R.anim.pulse)
-        val textFadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+        val slideUpText = AnimationUtils.loadAnimation(this, R.anim.slide_up_fade)
 
         binding.ivSplashLogo.startAnimation(fadeIn)
         fadeIn.setAnimationListener(object : Animation.AnimationListener {
@@ -79,12 +81,33 @@ class MainActivity : AppCompatActivity() {
 
             override fun onAnimationEnd(animation: Animation) {
                 binding.ivSplashLogo.startAnimation(pulse)
+                
+                // Loqo bitəndən sonra yazını gətir
                 binding.tvEnjoyWatching.visibility = View.VISIBLE
-                binding.tvEnjoyWatching.startAnimation(textFadeIn)
+                binding.tvEnjoyWatching.startAnimation(slideUpText)
             }
 
             override fun onAnimationRepeat(animation: Animation) {}
         })
+
+        slideUpText.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {}
+
+            override fun onAnimationEnd(animation: Animation) {
+                // Animasiyalar tam bitdi
+                isSplashFinished = true
+                checkPendingResponse()
+            }
+
+            override fun onAnimationRepeat(animation: Animation) {}
+        })
+    }
+
+    private fun checkPendingResponse() {
+        pendingAuthResponse?.let {
+            handleAuthResponse(it)
+            pendingAuthResponse = null
+        }
     }
 
     private fun setupListeners() {
@@ -178,6 +201,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleAuthResponse(response: ApiResponse) {
+        if (!isSplashFinished) {
+            pendingAuthResponse = response
+            return
+        }
+
         if ("success".equals(response.status, ignoreCase = true)) {
             val expiry = response.expiryDate
 

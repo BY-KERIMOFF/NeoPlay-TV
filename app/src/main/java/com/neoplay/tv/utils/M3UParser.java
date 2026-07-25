@@ -25,6 +25,9 @@ public class M3UParser {
         String currentGroup = "";
         String currentUrl = "";
         String currentTvgId = "";
+        String currentCatchupType = "";
+        String currentCatchupDays = "0";
+        String currentCatchupSource = "";
 
         for (String line : lines) {
             line = line.trim();
@@ -52,6 +55,10 @@ public class M3UParser {
                 }
                 
                 currentGroup = getAttribute(line, "group-title");
+
+                currentCatchupType = getAttribute(line, "catchup");
+                currentCatchupDays = getAttribute(line, "catchup-days");
+                currentCatchupSource = getAttribute(line, "catchup-source");
                 
                 // Kanal adını virgül-dən sonra götür
                 int lastComma = line.lastIndexOf(",");
@@ -87,7 +94,14 @@ public class M3UParser {
                 }
                 if (currentName.isEmpty()) currentName = "Adsız Kanal " + channels.size();
 
-                channels.add(new Channel(currentId, currentName, currentLogo, currentUrl, currentGroup.intern(), currentTvgId));
+                int catchupDays = 0;
+                try {
+                    if (currentCatchupDays != null && !currentCatchupDays.isEmpty()) {
+                        catchupDays = Integer.parseInt(currentCatchupDays);
+                    }
+                } catch (Exception ignored) {}
+
+                channels.add(new Channel(currentId, currentName, currentLogo, currentUrl, currentGroup.intern(), currentTvgId, currentCatchupType, catchupDays, currentCatchupSource));
                 
                 // Növbəti kanal üçün sıfırla
                 currentId = "";
@@ -96,6 +110,9 @@ public class M3UParser {
                 currentGroup = "";
                 currentUrl = "";
                 currentTvgId = "";
+                currentCatchupType = "";
+                currentCatchupDays = "0";
+                currentCatchupSource = "";
             }
         }
         return channels;
