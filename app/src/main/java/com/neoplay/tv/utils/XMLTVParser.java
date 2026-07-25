@@ -24,6 +24,7 @@ public class XMLTVParser {
         "https://epg.pw/xmltv/feed/tr.xml",
         "https://iptv-epg.org/files/epg-tr.xml.gz",
         "https://epg.pw/xmltv/feed/ru.xml",
+        "https://epgshare01.online/epgshare01/epg_ripper_ALL_SOURCES1.xml.gz",
         "https://epg.pw/xmltv/feed/it.xml",
         "https://epg.pw/xmltv/feed/de.xml",
         "https://epg.pw/xmltv/feed/us.xml"
