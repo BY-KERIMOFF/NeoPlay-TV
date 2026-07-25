@@ -14,8 +14,8 @@ android {
         applicationId = "com.neoplay.tv"
         minSdk = 21
         targetSdk = 36
-        versionCode = 39
-        versionName = "1.3.8"
+        versionCode = 40
+        versionName = "1.3.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         

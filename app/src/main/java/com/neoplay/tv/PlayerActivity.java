@@ -41,6 +41,7 @@ import com.bumptech.glide.Glide;
 import com.neoplay.tv.adapters.ArchiveAdapter;
 import com.neoplay.tv.adapters.CategoryAdapter;
 import com.neoplay.tv.adapters.ChannelAdapter;
+import com.neoplay.tv.adapters.TrackAdapter;
 import com.neoplay.tv.api.ApiClient;
 import com.neoplay.tv.databinding.ActivityPlayerBinding;
 import com.neoplay.tv.models.Category;
@@ -125,6 +126,10 @@ public class PlayerActivity extends AppCompatActivity {
     
     private List<EpgProgram> archiveList = new ArrayList<>();
     private com.neoplay.tv.adapters.ArchiveAdapter archiveAdapter;
+    
+    private List<TrackAdapter.TrackInfo> trackList = new ArrayList<>();
+    private TrackAdapter trackAdapter;
+    private int currentTrackType = -1; // C.TRACK_TYPE_AUDIO or C.TRACK_TYPE_TEXT
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +151,7 @@ public class PlayerActivity extends AppCompatActivity {
         setupPlayerCategoryList();
         setupPlayerSearch();
         setupArchiveList();
+        setupTrackList();
         
         progressHandler.post(updateProgressRunnable);
 
@@ -171,6 +177,8 @@ public class PlayerActivity extends AppCompatActivity {
                     binding.playerChannelSidebar.setVisibility(View.GONE);
                 } else if (binding.playerArchiveSidebar.getVisibility() == View.VISIBLE) {
                     binding.playerArchiveSidebar.setVisibility(View.GONE);
+                } else if (binding.playerTracksSidebar.getVisibility() == View.VISIBLE) {
+                    binding.playerTracksSidebar.setVisibility(View.GONE);
                 } else {
                     setEnabled(false);
                     onBackPressed();
@@ -733,8 +741,82 @@ public class PlayerActivity extends AppCompatActivity {
             case KeyEvent.KEYCODE_Y:
                 toggleAspectRatio();
                 return true;
+            case KeyEvent.KEYCODE_PROG_RED:
+                showTrackSidebar(androidx.media3.common.C.TRACK_TYPE_AUDIO);
+                return true;
+            case KeyEvent.KEYCODE_PROG_GREEN:
+                showTrackSidebar(androidx.media3.common.C.TRACK_TYPE_TEXT);
+                return true;
+            case KeyEvent.KEYCODE_PROG_BLUE:
+                binding.playerChannelSidebar.setVisibility(View.VISIBLE);
+                binding.etPlayerSearch.requestFocus();
+                return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void setupTrackList() {
+        trackAdapter = new TrackAdapter(trackList, track -> {
+            if (exoPlayer == null) return;
+            
+            androidx.media3.common.TrackSelectionParameters params;
+            if (track.trackIndex == -1) {
+                // Altyazını söndür
+                params = exoPlayer.getTrackSelectionParameters()
+                        .buildUpon()
+                        .setTrackTypeDisabled(currentTrackType, true)
+                        .build();
+            } else {
+                params = exoPlayer.getTrackSelectionParameters()
+                        .buildUpon()
+                        .setOverrideForType(new androidx.media3.common.TrackSelectionOverride(track.group.getMediaTrackGroup(), track.trackIndex))
+                        .setTrackTypeDisabled(currentTrackType, false)
+                        .build();
+            }
+            
+            exoPlayer.setTrackSelectionParameters(params);
+            binding.playerTracksSidebar.setVisibility(View.GONE);
+            String type = (currentTrackType == androidx.media3.common.C.TRACK_TYPE_AUDIO) ? "Səs dili" : "Altyazı";
+            android.widget.Toast.makeText(this, type + " dəyişdirildi: " + track.name, android.widget.Toast.LENGTH_SHORT).show();
+        });
+        binding.rvTracks.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
+        binding.rvTracks.setAdapter(trackAdapter);
+    }
+
+    private void showTrackSidebar(int type) {
+        if (exoPlayer == null) return;
+        this.currentTrackType = type;
+        trackList.clear();
+        
+        binding.tvTracksTitle.setText(type == androidx.media3.common.C.TRACK_TYPE_AUDIO ? "SƏS DİLLƏRİ" : "ALTYAZILAR");
+        
+        androidx.media3.common.Tracks tracks = exoPlayer.getCurrentTracks();
+        for (androidx.media3.common.Tracks.Group group : tracks.getGroups()) {
+            if (group.getType() == type) {
+                for (int i = 0; i < group.length; i++) {
+                    androidx.media3.common.Format format = group.getTrackFormat(i);
+                    String label = format.label != null ? format.label : (format.language != null ? format.language : "Naməlum Dil");
+                    trackList.add(new TrackAdapter.TrackInfo(label, group, i, group.isTrackSelected(i)));
+                }
+            }
+        }
+        
+        if (type == androidx.media3.common.C.TRACK_TYPE_TEXT) {
+            // Altyazını söndürmək variantı
+            trackList.add(0, new TrackAdapter.TrackInfo("Söndür", null, -1, !tracks.isTypeSelected(type)));
+        }
+
+        if (trackList.isEmpty()) {
+            android.widget.Toast.makeText(this, "Bu yayımda seçim yoxdur", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        trackAdapter.notifyDataSetChanged();
+        binding.playerTracksSidebar.setVisibility(View.VISIBLE);
+        binding.playerChannelSidebar.setVisibility(View.GONE);
+        binding.rvPlayerCategories.setVisibility(View.GONE);
+        binding.playerArchiveSidebar.setVisibility(View.GONE);
+        binding.rvTracks.requestFocus();
     }
 
     @Override
