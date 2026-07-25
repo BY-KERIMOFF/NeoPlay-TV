@@ -69,6 +69,7 @@ public class SettingsActivity extends AppCompatActivity {
         
         setupFocusEffect(binding.cbAppLock);
         setupFocusEffect(binding.btnChangePin);
+        setupFocusEffect(binding.btnPrivacyPolicy);
 
         binding.cbBootOnStartup.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean("boot_on_startup", isChecked).apply();
@@ -110,6 +111,13 @@ public class SettingsActivity extends AppCompatActivity {
 
         binding.btnSpeedTest.setOnClickListener(v -> {
             startActivity(new Intent(SettingsActivity.this, SpeedTestActivity.class));
+        });
+
+        binding.btnPrivacyPolicy.setOnClickListener(v -> {
+            String url = "https://github.com/BY-KERIMOFF/NeoPlay-TV/blob/main/PRIVACY_POLICY.md"; // Default placeholder
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(android.net.Uri.parse(url));
+            startActivity(i);
         });
 
         binding.btnTimerOff.setOnClickListener(v -> setSleepTimer(0));
