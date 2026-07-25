@@ -83,14 +83,7 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
         holder.itemView.setSelected(position == selectedPosition);
 
         holder.itemView.setOnClickListener(v -> listener.onChannelClick(channel));
-        holder.itemView.setOnKeyListener((v, keyCode, event) -> {
-            if (event.getAction() == android.view.KeyEvent.ACTION_DOWN && 
-                (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER || keyCode == android.view.KeyEvent.KEYCODE_ENTER)) {
-                listener.onChannelClick(channel);
-                return true;
-            }
-            return false;
-        });
+        
         holder.itemView.setOnLongClickListener(v -> {
             listener.onChannelLongClick(channel);
             return true;

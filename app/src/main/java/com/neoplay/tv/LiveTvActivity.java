@@ -215,9 +215,10 @@ public class LiveTvActivity extends AppCompatActivity {
 
             @Override
             public void onChannelLongClick(Channel channel) {
-                favoriteManager.toggleFavorite(channel.getId());
+                boolean isAdded = favoriteManager.toggleFavorite(channel.getId());
                 channelAdapter.notifyDataSetChanged();
-                Toast.makeText(LiveTvActivity.this, "Sevimli statusu dəyişdi", Toast.LENGTH_SHORT).show();
+                String message = isAdded ? "Sevimli siyahısına əlavə edildi" : "Sevimli siyahısından çıxarıldı";
+                Toast.makeText(LiveTvActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
         binding.rvChannels.setLayoutManager(new LinearLayoutManager(this));

@@ -241,8 +241,10 @@ public class PlayerActivity extends AppCompatActivity {
             @Override
             public void onChannelLongClick(Channel channel) {
                 FavoriteManager fm = new FavoriteManager(PlayerActivity.this);
-                fm.toggleFavorite(channel.getId());
+                boolean isAdded = fm.toggleFavorite(channel.getId());
                 channelAdapter.notifyDataSetChanged();
+                String message = isAdded ? "Sevimli siyahısına əlavə edildi" : "Sevimli siyahısından çıxarıldı";
+                android.widget.Toast.makeText(PlayerActivity.this, message, android.widget.Toast.LENGTH_SHORT).show();
             }
         });
         binding.rvPlayerChannels.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
@@ -738,6 +740,11 @@ public class PlayerActivity extends AppCompatActivity {
     @Override
     public boolean onKeyLongPress(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) {
+            // Əgər kanal və ya kateqoriya siyahısı açıqdırsa, arxiv açılmasın (favorit üçün saxlanılır)
+            if (binding.playerChannelSidebar.getVisibility() == View.VISIBLE || 
+                binding.rvPlayerCategories.getVisibility() == View.VISIBLE) {
+                return false;
+            }
             showArchiveSidebar();
             return true;
         }
