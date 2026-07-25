@@ -62,6 +62,9 @@ class MainActivity : AppCompatActivity() {
         // Yeniləməni yoxla
         UpdateManager(this).checkForUpdates()
 
+        // Qlobal loqo bazasını yüklə
+        com.neoplay.tv.utils.LogoManager.loadLogoDatabase()
+
         // EPG Sinxronizasiyasını başlat
         XMLTVParser.syncDefaultSources()
 

@@ -417,10 +417,16 @@ public class LiveTvActivity extends AppCompatActivity {
             if (vods != null && !vods.isEmpty()) {
                 for (XtreamChannel xc : vods) {
                     if (xc.getStreamId() == null || xc.getStreamId().isEmpty() || xc.getName() == null) continue;
+                    
+                    String logo = xc.getLogo();
+                    if (logo == null || logo.isEmpty()) {
+                        logo = com.neoplay.tv.utils.LogoManager.INSTANCE.getLogoForChannel(xc.getName());
+                    }
+                    
                     String ext = type.equals("series") ? "mkv" : xc.getContainerExtension();
                     String vodTypePath = type.equals("series") ? "series" : "movie";
                     String streamLink = cleanHost + "/" + vodTypePath + "/" + xtUser + "/" + xtPass + "/" + xc.getStreamId() + "." + ext;
-                    Channel channel = new Channel(xc.getStreamId(), xc.getName(), xc.getLogo(), streamLink, xc.getCategoryId());
+                    Channel channel = new Channel(xc.getStreamId(), xc.getName(), logo != null ? logo : "", streamLink, xc.getCategoryId());
                     tempAll.add(channel);
                     
                     String catId = xc.getCategoryId();
@@ -457,8 +463,14 @@ public class LiveTvActivity extends AppCompatActivity {
             if (xtChannels != null && !xtChannels.isEmpty()) {
                 for (XtreamChannel xc : xtChannels) {
                     if (xc.getStreamId() == null || xc.getName() == null) continue;
+                    
+                    String logo = xc.getLogo();
+                    if (logo == null || logo.isEmpty()) {
+                        logo = com.neoplay.tv.utils.LogoManager.INSTANCE.getLogoForChannel(xc.getName());
+                    }
+                    
                     String streamLink = cleanHost + "/live/" + xtUser + "/" + xtPass + "/" + xc.getStreamId() + ".ts";
-                    Channel channel = new Channel(xc.getStreamId(), xc.getName(), xc.getLogo(), streamLink, xc.getCategoryId());
+                    Channel channel = new Channel(xc.getStreamId(), xc.getName(), logo != null ? logo : "", streamLink, xc.getCategoryId());
                     tempAll.add(channel);
                     
                     String catId = xc.getCategoryId() != null ? xc.getCategoryId() : "0";
@@ -539,6 +551,16 @@ public class LiveTvActivity extends AppCompatActivity {
                 reader.close();
                 
                 List<Channel> parsedChannels = M3UParser.parse(sb.toString());
+                
+                // Loqoları yoxla və çatışmayanları qlobal bazadan götür
+                for (Channel ch : parsedChannels) {
+                    if (ch.getLogoUrl() == null || ch.getLogoUrl().isEmpty()) {
+                        String globalLogo = com.neoplay.tv.utils.LogoManager.INSTANCE.getLogoForChannel(ch.getName());
+                        if (globalLogo != null) {
+                            ch.setLogoUrl(globalLogo);
+                        }
+                    }
+                }
                 
                 // EPG yükləməsini başlat
                 String epgUrl = DataManager.getGlobalEpgUrl();
