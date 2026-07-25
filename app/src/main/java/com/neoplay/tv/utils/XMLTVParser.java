@@ -21,7 +21,11 @@ public class XMLTVParser {
 
     private static final String[] DEFAULT_SOURCES = {
         "https://epg.pw/xmltv/feed/az.xml",
-        "https://epg.pw/xmltv/feed/tr.xml"
+        "https://epg.pw/xmltv/feed/tr.xml",
+        "https://epg.pw/xmltv/feed/ru.xml",
+        "https://epg.pw/xmltv/feed/it.xml",
+        "https://epg.pw/xmltv/feed/de.xml",
+        "https://epg.pw/xmltv/feed/us.xml"
     };
 
     public static void syncDefaultSources() {
@@ -34,7 +38,9 @@ public class XMLTVParser {
         if (name == null) return "";
         return name.toLowerCase(Locale.US)
                 .replaceAll("\\s+", "") // boşluqları sil
-                .replaceAll("hd|sd|fhd|uhd|4k|az|tr|\\+|test", "") // lazımsız sözləri sil
+                .replaceAll("\\(.*?\\)", "") // mötərizə daxilini sil
+                .replaceAll("\\[.*?\\]", "") // kvadrat mötərizə daxilini sil
+                .replaceAll("hd|sd|fhd|uhd|4k|az|tr|ru|en|us|uk|\\+|test|premium|vip|cinema|film", "") // lazımsız sözləri sil
                 .trim();
     }
 
@@ -126,11 +132,34 @@ public class XMLTVParser {
         return programs;
     }
 
-    private static boolean isCurrent(String start, String stop, String now) {
+    private static boolean isCurrent(String start, String stop, String nowIgnore) {
         if (start == null || stop == null) return false;
-        // Format: 20230724230000 +0300 or 20230724230000
-        String cleanStart = start.split(" ")[0];
-        String cleanStop = stop.split(" ")[0];
-        return now.compareTo(cleanStart) >= 0 && now.compareTo(cleanStop) < 0;
+        try {
+            // XMLTV formatı: 20230724230000 +0300 və ya 20230724230000
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss Z", Locale.US);
+            
+            String cleanStart = start.contains(" ") ? start : start + " +0000";
+            String cleanStop = stop.contains(" ") ? stop : stop + " +0000";
+            
+            long startTime = sdf.parse(cleanStart).getTime();
+            long stopTime = sdf.parse(cleanStop).getTime();
+            long currentTime = System.currentTimeMillis();
+            
+            return currentTime >= startTime && currentTime < stopTime;
+        } catch (Exception e) {
+            // Əgər offset formatı fərqlidirsə ehtiyat variant (köhnə məntiq)
+            try {
+                String s = start.split(" ")[0];
+                String e_time = stop.split(" ")[0];
+                SimpleDateFormat sdfSimple = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
+                sdfSimple.setTimeZone(TimeZone.getTimeZone("UTC"));
+                long startTime = sdfSimple.parse(s).getTime();
+                long stopTime = sdfSimple.parse(e_time).getTime();
+                long currentTime = System.currentTimeMillis();
+                return currentTime >= startTime && currentTime < stopTime;
+            } catch (Exception ex) {
+                return false;
+            }
+        }
     }
 }

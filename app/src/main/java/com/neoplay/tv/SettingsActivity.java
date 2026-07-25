@@ -103,10 +103,13 @@ public class SettingsActivity extends AppCompatActivity {
         binding.btnRefreshData.setOnClickListener(v -> {
             String manualEpg = binding.etEpgUrl.getText().toString().trim();
             prefs.edit().putString("manual_epg_url", manualEpg).apply();
+            
+            // Həm daxili mənbələri, həm də manual linki yenilə
+            com.neoplay.tv.utils.XMLTVParser.syncDefaultSources();
             if (!manualEpg.isEmpty()) {
                 com.neoplay.tv.utils.XMLTVParser.downloadAndParse(manualEpg);
             }
-            Toast.makeText(this, "Məlumatlar yenilənir...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Bütün EPG mənbələri yenilənir...", Toast.LENGTH_SHORT).show();
         });
 
         binding.btnSpeedTest.setOnClickListener(v -> {
