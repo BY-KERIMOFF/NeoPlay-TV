@@ -656,6 +656,21 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            if (keyCode == KeyEvent.KEYCODE_CHANNEL_UP) {
+                playNextChannel();
+                return true;
+            } else if (keyCode == KeyEvent.KEYCODE_CHANNEL_DOWN) {
+                playPreviousChannel();
+                return true;
+            }
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // Rəqəm düymələrini tut (0-9)
         if (keyCode >= KeyEvent.KEYCODE_0 && keyCode <= KeyEvent.KEYCODE_9) {
@@ -730,12 +745,6 @@ public class PlayerActivity extends AppCompatActivity {
                 if (binding.playerArchiveSidebar.getVisibility() == View.VISIBLE) {
                     return super.onKeyDown(keyCode, event);
                 }
-                playPreviousChannel();
-                return true;
-            case KeyEvent.KEYCODE_CHANNEL_UP:
-                playNextChannel();
-                return true;
-            case KeyEvent.KEYCODE_CHANNEL_DOWN:
                 playPreviousChannel();
                 return true;
             case KeyEvent.KEYCODE_VOLUME_UP:
