@@ -732,6 +732,12 @@ public class PlayerActivity extends AppCompatActivity {
                 }
                 playPreviousChannel();
                 return true;
+            case KeyEvent.KEYCODE_CHANNEL_UP:
+                playNextChannel();
+                return true;
+            case KeyEvent.KEYCODE_CHANNEL_DOWN:
+                playPreviousChannel();
+                return true;
             case KeyEvent.KEYCODE_VOLUME_UP:
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 // Səsin dəyişməsini gözləmək üçün kiçik gecikmə ilə UI-ı yenilə
